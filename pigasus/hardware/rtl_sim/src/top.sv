@@ -1,3 +1,4 @@
+`include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 `include "./src/stats_reg.sv"
 
