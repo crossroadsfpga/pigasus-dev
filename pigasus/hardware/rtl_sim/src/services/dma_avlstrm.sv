@@ -16,7 +16,7 @@ module dma_avlstrm (
     input   logic                   disable_pcie,
     input   logic [PDU_META_WIDTH-1:0] pdumeta_cpu_data,        
     input   logic                   pdumeta_cpu_valid,
-    input   logic                   pdumeta_cpu_ready,
+    output   logic                   pdumeta_cpu_ready,
     output  logic [31:0]            pdumeta_cpu_csr_readdata,
 
     // DRAM

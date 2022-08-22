@@ -21,13 +21,6 @@ module ethernet_mux_avlstrm (
   server#(.DATA_BITS(512)) mux();
   server#(.DATA_BITS(512)) out();
 
-//  assign out_valid = out.txP.tx;
-//  assign out_data = out.txP.tx_msg.data;
-//  assign out_startofpacket = out.txP.tx_msg.head.arg3[0];
-//  assign out_endofpacket = out.txP.tx_msg.head.arg3[1];
-//  assign out_empty = out.txP.tx_msg.head.arg3[7:2];
-//  assign out.txFull = ~out_ready;
-
   assign out_valid = out.valid;
   assign out_data = out.data;
   assign out_startofpacket = out.sop;
