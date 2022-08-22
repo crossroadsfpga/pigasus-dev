@@ -673,29 +673,29 @@ assign pcie_rb_update_valid = disable_pcie ? 1'b0 : internal_rb_update_valid;
 
 // PDU meta occupancy cnt
 assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) ethernet_out1_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) ethernet_out2_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) ethernet_out4_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) unused_0();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) ethernet_out0_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) ethernet_out3_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) r_eth_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) fifo0_in_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) fifo1_in_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) dm2sm_in_pkt_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) dm2sm_in_meta_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) dm2sm_in_usr_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) fpm_in_pkt_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) fpm_in_meta_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) fpm_in_usr_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) sm2pg_in_pkt_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) sm2pg_in_meta_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) sm2pg_in_usr_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) cross_FPGA_mux_in_pkt_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) cross_FPGA_mux_in_meta_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) cross_FPGA_mux_in_usr_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) eth_1_out_direct();
-    ethernet_service_multi_out my_ethernet (
+    avl_stream_if#(.WIDTH(512)) ethernet_out1_direct();
+    avl_stream_if#(.WIDTH(512)) ethernet_out2_direct();
+    avl_stream_if#(.WIDTH(512)) ethernet_out4_direct();
+    avl_stream_if#(.WIDTH(512)) unused_0();
+    avl_stream_if#(.WIDTH(512)) ethernet_out0_direct();
+    avl_stream_if#(.WIDTH(512)) ethernet_out3_direct();
+    avl_stream_if#(.WIDTH(512)) r_eth_direct();
+    avl_stream_if#(.WIDTH(512)) fifo0_in_direct();
+    avl_stream_if#(.WIDTH(512)) fifo1_in_direct();
+    avl_stream_if#(.WIDTH(512)) dm2sm_in_pkt_direct();
+    avl_stream_if#(.WIDTH($bits(metadata_t))) dm2sm_in_meta_direct();
+    avl_stream_if#(.WIDTH(512)) dm2sm_in_usr_direct();
+    avl_stream_if#(.WIDTH(512)) fpm_in_pkt_direct();
+    avl_stream_if#(.WIDTH($bits(metadata_t))) fpm_in_meta_direct();
+    avl_stream_if#(.WIDTH(512)) fpm_in_usr_direct();
+    avl_stream_if#(.WIDTH(512)) sm2pg_in_pkt_direct();
+    avl_stream_if#(.WIDTH($bits(metadata_t))) sm2pg_in_meta_direct();
+    avl_stream_if#(.WIDTH(512)) sm2pg_in_usr_direct();
+    avl_stream_if#(.WIDTH(512)) cross_FPGA_mux_in_pkt_direct();
+    avl_stream_if#(.WIDTH($bits(metadata_t))) cross_FPGA_mux_in_meta_direct();
+    avl_stream_if#(.WIDTH(512)) cross_FPGA_mux_in_usr_direct();
+    avl_stream_if#(.WIDTH(512)) eth_1_out_direct();
+    ethernet_multi_out_avlstrm my_ethernet (
         .Clk(clk),
         .Rst_n(rst_n),
         .out_data(out_data),
@@ -717,7 +717,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .out4(ethernet_out4_direct),
         .in(r_eth_direct)
     );
-    reassembler_service my_r (
+    reassembler_avlstrm my_r (
         .Clk(clk),
         .Rst_n(rst_n),
         .pkt_buffer_writeaddress(pkt_buf_wraddress),
@@ -749,14 +749,14 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .out_meta(dm2sm_in_meta_direct),
         .out_usr(dm2sm_in_usr_direct)
     );
-    unified_pkt_fifo_service#(.FIFO_NAME("[top] fifo0"), .MEM_TYPE("M20K"), .DUAL_CLOCK(0), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo0 (
+    unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo0"), .MEM_TYPE("M20K"), .DUAL_CLOCK(0), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo0 (
         .Clk_i(clk),
         .Rst_n_i(rst_n),
         .fill_level(dm_nopayload_pkt_csr_readdata),
         .in(fifo0_in_direct),
         .out(ethernet_out0_direct)
     );
-    unified_pkt_fifo_service#(.FIFO_NAME("[top] fifo1"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo1 (
+    unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo1"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo1 (
         .Clk_i(clk_pcie),
         .Rst_n_i(rst_n_pcie),
         .Clk_o(clk),
@@ -765,7 +765,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .in(fifo1_in_direct),
         .out(ethernet_out3_direct)
     );
-    channel_fifo_service#(.DUAL_CLOCK(1)) my_dm2sm (
+    channel_fifo_avlstrm#(.DUAL_CLOCK(1)) my_dm2sm (
         .Clk_i(clk),
         .Rst_n_i(rst_n),
         .Clk_o(clk),
@@ -782,7 +782,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .out_meta(fpm_in_meta_direct),
         .out_usr(fpm_in_usr_direct)
     );
-    fast_pm_service my_fpm (
+    fast_pm_avlstrm my_fpm (
         .Clk(clk),
         .Rst_n(rst_n),
         .Clk_front(clk_high),
@@ -805,7 +805,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .out_meta(sm2pg_in_meta_direct),
         .out_usr(sm2pg_in_usr_direct)
     );
-    channel_fifo_service#(.DUAL_CLOCK(1)) my_sm2pg (
+    channel_fifo_avlstrm#(.DUAL_CLOCK(1)) my_sm2pg (
         .Clk_i(clk_pcie),
         .Rst_n_i(rst_n_pcie),
         .Clk_o(clk),
@@ -822,7 +822,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .out_meta(cross_FPGA_mux_in_meta_direct),
         .out_usr(cross_FPGA_mux_in_usr_direct)
     );
-    stream_mux_service my_cross_FPGA_mux (
+    stream_mux_avlstrm my_cross_FPGA_mux (
         .Clk(clk),
         .Rst_n(rst_n),
         .in_pkt(cross_FPGA_mux_in_pkt_direct),
@@ -830,7 +830,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .in_usr(cross_FPGA_mux_in_usr_direct),
         .out(eth_1_out_direct)
     );
-    ethernet_service my_eth_1 (
+    ethernet_avlstrm my_eth_1 (
         .Clk(clk),
         .Rst_n(rst_n),
         .out_data(out_1_data),

@@ -662,34 +662,34 @@ assign pcie_rb_update_valid = disable_pcie ? 1'b0 : internal_rb_update_valid;
 
 // PDU meta occupancy cnt
 assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) ethernet_out0_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) ethernet_out3_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) fifo2_in_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) ethernet_out1_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) ethernet_out2_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) ethernet_out4_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) fifo3_in_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) fifo4_in_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) cross_FPGA_demux_in_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) sm2pg_in_pkt_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) sm2pg_in_meta_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) sm2pg_in_usr_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) pg_in_pkt_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) pg_in_meta_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) pg_in_usr_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) pg2nf_in_pkt_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) pg2nf_in_meta_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) pg2nf_in_usr_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) nf_in_pkt_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) nf_in_meta_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) nf_in_usr_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) by2pd_in_pkt_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) by2pd_in_meta_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) by2pd_in_usr_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) dma_in_pkt_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) dma_in_meta_direct();
-    server#(.SDARG_BITS(32), .DATA_BITS(512)) dma_in_usr_direct();
-    unified_pkt_fifo_service#(.FIFO_NAME("[top] fifo2"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo2 (
+    avl_stream_if#(.WIDTH(512)) ethernet_out0_direct();
+    avl_stream_if#(.WIDTH(512)) ethernet_out3_direct();
+    avl_stream_if#(.WIDTH(512)) fifo2_in_direct();
+    avl_stream_if#(.WIDTH(512)) ethernet_out1_direct();
+    avl_stream_if#(.WIDTH(512)) ethernet_out2_direct();
+    avl_stream_if#(.WIDTH(512)) ethernet_out4_direct();
+    avl_stream_if#(.WIDTH(512)) fifo3_in_direct();
+    avl_stream_if#(.WIDTH(512)) fifo4_in_direct();
+    avl_stream_if#(.WIDTH(512)) cross_FPGA_demux_in_direct();
+    avl_stream_if#(.WIDTH(512)) sm2pg_in_pkt_direct();
+    avl_stream_if#(.WIDTH($bits(metadata_t))) sm2pg_in_meta_direct();
+    avl_stream_if#(.WIDTH(512)) sm2pg_in_usr_direct();
+    avl_stream_if#(.WIDTH(512)) pg_in_pkt_direct();
+    avl_stream_if#(.WIDTH($bits(metadata_t))) pg_in_meta_direct();
+    avl_stream_if#(.WIDTH(512)) pg_in_usr_direct();
+    avl_stream_if#(.WIDTH(512)) pg2nf_in_pkt_direct();
+    avl_stream_if#(.WIDTH($bits(metadata_t))) pg2nf_in_meta_direct();
+    avl_stream_if#(.WIDTH(512)) pg2nf_in_usr_direct();
+    avl_stream_if#(.WIDTH(512)) nf_in_pkt_direct();
+    avl_stream_if#(.WIDTH($bits(metadata_t))) nf_in_meta_direct();
+    avl_stream_if#(.WIDTH(512)) nf_in_usr_direct();
+    avl_stream_if#(.WIDTH(512)) by2pd_in_pkt_direct();
+    avl_stream_if#(.WIDTH($bits(metadata_t))) by2pd_in_meta_direct();
+    avl_stream_if#(.WIDTH(512)) by2pd_in_usr_direct();
+    avl_stream_if#(.WIDTH(512)) dma_in_pkt_direct();
+    avl_stream_if#(.WIDTH($bits(metadata_t))) dma_in_meta_direct();
+    avl_stream_if#(.WIDTH(512)) dma_in_usr_direct();
+    unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo2"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo2 (
         .Clk_i(clk_pcie),
         .Rst_n_i(rst_n_pcie),
         .Clk_o(clk),
@@ -698,7 +698,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .in(fifo2_in_direct),
         .out(ethernet_out4_direct)
     );
-    ethernet_service_multi_out my_ethernet (
+    ethernet_multi_out_avlstrm my_ethernet (
         .Clk(clk),
         .Rst_n(rst_n),
         .out_data(out_data),
@@ -720,7 +720,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .out4(ethernet_out4_direct),
         .in(cross_FPGA_demux_in_direct)
     );
-    unified_pkt_fifo_service#(.FIFO_NAME("[top] fifo3"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo3 (
+    unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo3"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo3 (
         .Clk_i(clk_pcie),
         .Rst_n_i(rst_n_pcie),
         .Clk_o(clk),
@@ -729,7 +729,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .in(fifo3_in_direct),
         .out(ethernet_out1_direct)
     );
-    unified_pkt_fifo_service#(.FIFO_NAME("[top] fifo4"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo4 (
+    unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo4"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo4 (
         .Clk_i(clk_pcie),
         .Rst_n_i(rst_n_pcie),
         .Clk_o(clk),
@@ -738,7 +738,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .in(fifo4_in_direct),
         .out(ethernet_out2_direct)
     );
-    stream_demux_service my_cross_FPGA_demux (
+    stream_demux_avlstrm my_cross_FPGA_demux (
         .Clk(clk),
         .Rst_n(rst_n),
         .in(cross_FPGA_demux_in_direct),
@@ -746,7 +746,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .out_meta(sm2pg_in_meta_direct),
         .out_usr(sm2pg_in_usr_direct)
     );
-    channel_fifo_service#(.DUAL_CLOCK(1)) my_sm2pg (
+    channel_fifo_avlstrm#(.DUAL_CLOCK(1)) my_sm2pg (
         .Clk_i(clk),
         .Rst_n_i(rst_n),
         .Clk_o(clk_pcie),
@@ -763,7 +763,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .out_meta(pg_in_meta_direct),
         .out_usr(pg_in_usr_direct)
     );
-    port_group_matcher_service my_pg (
+    port_group_matcher_avlstrm my_pg (
         .Clk(clk_pcie),
         .Rst_n(rst_n_pcie),
         .stats_out_pkt(stats_out_pkt_pg),
@@ -782,7 +782,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .out_meta(pg2nf_in_meta_direct),
         .out_usr(pg2nf_in_usr_direct)
     );
-    channel_fifo_service#(.DUAL_CLOCK(1)) my_pg2nf (
+    channel_fifo_avlstrm#(.DUAL_CLOCK(1)) my_pg2nf (
         .Clk_i(clk_pcie),
         .Rst_n_i(rst_n_pcie),
         .Clk_o(clk_pcie),
@@ -799,7 +799,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .out_meta(nf_in_meta_direct),
         .out_usr(nf_in_usr_direct)
     );
-    non_fast_pm_service my_nf (
+    non_fast_pm_avlstrm my_nf (
         .Clk(clk_pcie),
         .Rst_n(rst_n_pcie),
         .Clk_high(clk_high),
@@ -828,7 +828,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .out_meta(by2pd_in_meta_direct),
         .out_usr(by2pd_in_usr_direct)
     );
-    channel_fifo_service#(.DUAL_CLOCK(1)) my_by2pd (
+    channel_fifo_avlstrm#(.DUAL_CLOCK(1)) my_by2pd (
         .Clk_i(clk_pcie),
         .Rst_n_i(rst_n_pcie),
         .Clk_o(clk_pcie),
@@ -845,7 +845,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .out_meta(dma_in_meta_direct),
         .out_usr(dma_in_usr_direct)
     );
-    dma_service my_dma (
+    dma_avlstrm my_dma (
         .Clk(clk_pcie),
         .Rst_n(rst_n_pcie),
         .pcie_rb_wr_data(pcie_rb_wr_data),
