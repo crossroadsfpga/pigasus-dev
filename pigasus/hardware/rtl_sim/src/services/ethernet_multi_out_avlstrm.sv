@@ -30,21 +30,36 @@ module ethernet_multi_out_avlstrm (
     avl_stream_if#(.WIDTH(512)) mux();
     avl_stream_if#(.WIDTH(512)) out();
     
-    assign out_valid = out.txP.tx;
-    assign out_data = out.txP.tx_msg.data;
-    assign out_sop = out.txP.tx_msg.head.arg3[0];
-    assign out_eop = out.txP.tx_msg.head.arg3[1];
-    assign out_empty = out.txP.tx_msg.head.arg3[7:2];
-    assign out.txFull = ~out_ready;
-    assign out.txAlmostFull = out_almostfull;
+//    assign out_valid = out.txP.tx;
+//    assign out_data = out.txP.tx_msg.data;
+//    assign out_sop = out.txP.tx_msg.head.arg3[0];
+//    assign out_eop = out.txP.tx_msg.head.arg3[1];
+//    assign out_empty = out.txP.tx_msg.head.arg3[7:2];
+//    assign out.txFull = ~out_ready;
+//    assign out.txAlmostFull = out_almostfull;
+//    
+//    always_comb begin
+//        in.txP.tx_msg.head = '0;
+//        in.txP.tx_msg.head.arg3 = {32'd0}|{in_empty,in_eop,in_sop};
+//    end
+//    assign in.txP.tx_msg.data = in_data; 
+//    assign in.txP.tx = in_valid; 
+//    assign in_ready  = ~in.txFull;
+
+    assign out_valid = out.valid;
+    assign out_data = out.data;
+    assign out_sop = out.sop;
+    assign out_eop = out.eop;
+    assign out_empty = out.empty;
+    assign out.ready = out_ready;
+    assign out.almost_full = out_almostfull;
     
-    always_comb begin
-        in.txP.tx_msg.head = '0;
-        in.txP.tx_msg.head.arg3 = {32'd0}|{in_empty,in_eop,in_sop};
-    end
-    assign in.txP.tx_msg.data = in_data; 
-    assign in.txP.tx = in_valid; 
-    assign in_ready  = ~in.txFull;
+   assign in.empty=in_empty;
+   assign in.eop=in_eop;
+   assign in.sop=in_sop;
+   assign in.data = in_data; 
+   assign in.valid = in_valid; 
+   assign in_ready  = in.ready;
     
     pkt_mux_avlstrm_3 mux_hi (
       .Clk(Clk), 

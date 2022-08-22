@@ -52,17 +52,25 @@ module reassembler_avlstrm (
     avl_stream_if#(.WIDTH($bits(metadata_t))) dm_meta_in();
     avl_stream_if#(.WIDTH($bits(metadata_t))) dm_meta_out();
 
-assign eth.txFull = 1'b0;
-input_comp_avlstrm incomp (
+//assign eth.txFull = 1'b0;
+   assign eth.ready = 1'b1;
+   
+   input_comp_avlstrm incomp (
     .Clk(Clk),
     .Rst_n(Rst_n),
     .stats_out_meta(stats_incomp_out_meta),
 
-    .eth_sop                (eth.txP.tx_msg.head.arg3[0]),
-    .eth_eop                (eth.txP.tx_msg.head.arg3[1]),
-    .eth_data               (eth.txP.tx_msg.data),
-    .eth_empty              (eth.txP.tx_msg.head.arg3[7:2]),
-    .eth_valid              (eth.txP.tx),
+//    .eth_sop                (eth.txP.tx_msg.head.arg3[0]),
+//    .eth_eop                (eth.txP.tx_msg.head.arg3[1]),
+//    .eth_data               (eth.txP.tx_msg.data),
+//    .eth_empty              (eth.txP.tx_msg.head.arg3[7:2]),
+//    .eth_valid              (eth.txP.tx),
+    .eth_sop                (eth.sop),
+    .eth_eop                (eth.eop),
+    .eth_data               (eth.data),
+    .eth_empty              (eth.empty),
+    .eth_valid              (eth.valid),
+
     .pkt_buffer_address     (pkt_buffer_writeaddress),
     .pkt_buffer_write       (pkt_buffer_write),
     .pkt_buffer_writedata   (pkt_buffer_writedata),
