@@ -18,8 +18,8 @@ module ethernet_mux_avlstrm (
     avl_stream_if.rx in3,
     avl_stream_if.rx in4
 );
-  server#(.DATA_BITS(512)) mux();
-  server#(.DATA_BITS(512)) out();
+  avl_stream_if#(.WIDTH(512)) mux();
+  avl_stream_if#(.WIDTH(512)) out();
 
   assign out_valid = out.valid;
   assign out_data = out.data;
