@@ -617,11 +617,11 @@ logic [31:0] stats_readdata;
 avl_stream_if#(.WIDTH($bits(stats_t))) r_stats_clk();
 avl_stream_if#(.WIDTH($bits(stats_t))) dm2sm_stats_clk();
 avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats_clk();
-avl_stream_if#(.WIDTH($bits(stats_t))) sm2pg_stats_pcie();
-avl_stream_if#(.WIDTH($bits(stats_t))) pg_stats_pcie();
-avl_stream_if#(.WIDTH($bits(stats_t))) pg2nf_stats_pcie();
+avl_stream_if#(.WIDTH($bits(stats_t))) sm2pg_stats_pcie();//
+avl_stream_if#(.WIDTH($bits(stats_t))) pg_stats_pcie();//
+avl_stream_if#(.WIDTH($bits(stats_t))) pg2nf_stats_pcie();//
 avl_stream_if#(.WIDTH($bits(stats_t))) nf_stats_pcie();
-avl_stream_if#(.WIDTH($bits(stats_t))) by2pd_stats_pcie();
+avl_stream_if#(.WIDTH($bits(stats_t))) by2pd_stats_pcie();//
 
 avl_stream_if#(.WIDTH($bits(stats_t))) mux1();
 avl_stream_if#(.WIDTH($bits(stats_t))) all_stats_pcie();
@@ -636,13 +636,15 @@ pkt_mux_avlstrm_3 sm2pg_pg2nf_by2pd_mux1
    .in2(by2pd_stats_pcie),
    .out(mux1)
    );
-pkt_mux_avlstrm mux1_pg_mux
+
+pkt_mux_avlstrm_3 mux1_pg_nf_mux
   (
    .Clk(clk_pcie), 
    .Rst_n(rst_n_pcie),
    
    .in0(mux1),
    .in1(pg_stats_pcie),
+   .in2(nf_stats_pcie),
    .out(all_stats_pcie)
    );
    
@@ -701,16 +703,16 @@ always @(posedge clk_status) begin
                 //REG_PG_CHECK_PKT          : status_readdata <= pg_check_pkt_status;
                 //REG_PG_CHECK_PKT_SOP      : status_readdata <= pg_check_pkt_s_status;
                 //REG_PG_NOCHECK_PKT        : status_readdata <= pg_nocheck_pkt_status;
-                REG_BYPASS_PKT            : status_readdata <= bypass_pkt_status;
-                REG_BYPASS_PKT_SOP        : status_readdata <= bypass_pkt_s_status;
-                REG_BYPASS_META           : status_readdata <= bypass_meta_status;
-                REG_BYPASS_RULE           : status_readdata <= bypass_rule_status;
-                REG_NF_PKT                : status_readdata <= nf_pkt_status;
-                REG_NF_RULE               : status_readdata <= nf_rule_status;
-                REG_NF_META               : status_readdata <= nf_meta_status;
-                REG_NF_CHECK_PKT          : status_readdata <= nf_check_pkt_status;
-                REG_NF_CHECK_PKT_SOP      : status_readdata <= nf_check_pkt_s_status;
-                REG_NF_NOCHECK_PKT        : status_readdata <= nf_nocheck_pkt_status;
+                //REG_BYPASS_PKT            : status_readdata <= bypass_pkt_status;
+                //REG_BYPASS_PKT_SOP        : status_readdata <= bypass_pkt_s_status;
+                //REG_BYPASS_META           : status_readdata <= bypass_meta_status;
+                //REG_BYPASS_RULE           : status_readdata <= bypass_rule_status;
+                //REG_NF_PKT                : status_readdata <= nf_pkt_status;
+                //REG_NF_RULE               : status_readdata <= nf_rule_status;
+                //REG_NF_META               : status_readdata <= nf_meta_status;
+                //REG_NF_CHECK_PKT          : status_readdata <= nf_check_pkt_status;
+                //REG_NF_CHECK_PKT_SOP      : status_readdata <= nf_check_pkt_s_status;
+                //REG_NF_NOCHECK_PKT        : status_readdata <= nf_nocheck_pkt_status;
                 REG_MERGE_PKT             : status_readdata <= merge_pkt_status;
                 REG_MERGE_PKT_SOP         : status_readdata <= merge_pkt_s_status;
                 REG_MERGE_META            : status_readdata <= merge_meta_status;
@@ -1008,9 +1010,9 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .stats_out_rule(stats_out_rule_nf),
         .stats_nocheck_pkt(stats_nocheck_pkt_nf),
         .stats_check_pkt(stats_check_pkt_nf),
-        .stats_check_pkt_s(stats_check_pkt_s_nf),
+        .stats_check_pkt_sop(stats_check_pkt_s_nf),
         .stats_bypass_pkt(stats_bypass_pkt_nf),
-        .stats_bypass_pkt_s(stats_bypass_pkt_s_nf),
+        .stats_bypass_pkt_sop(stats_bypass_pkt_s_nf),
         .stats_bypass_meta(stats_bypass_meta_nf),
         .stats_bypass_rule(stats_bypass_rule_nf),
         .bypass_fill_level(bypass_fill_level_nf),
@@ -1019,6 +1021,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .nf_max_raw_pkt_fifo(nf_max_raw_pkt_fifo_nf),
         .nf_max_pkt_fifo(nf_max_pkt_fifo_nf),
         .nf_max_rule_fifo(nf_max_rule_fifo_nf),
+        .stats_out(nf_stats_pcie),
         .in_pkt(nf_in_pkt_direct),
         .in_meta(nf_in_meta_direct),
         .in_usr(nf_in_usr_direct),
