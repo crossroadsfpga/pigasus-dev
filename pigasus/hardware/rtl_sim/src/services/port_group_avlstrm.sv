@@ -9,8 +9,8 @@ module port_group_avlstrm (
     output logic [31:0]     stats_out_pkt,
     output logic [31:0]     stats_out_meta,
     output logic [31:0]     stats_out_rule,
-    output  logic [31:0]    no_pg_rule_cnt,
-    output  logic [31:0]    pg_rule_cnt,
+    output  logic [31:0]    stats_no_pg_rule_cnt,
+    output  logic [31:0]    stats_pg_rule_cnt,
 
     avl_stream_if.rx in_pkt,
     avl_stream_if.rx in_meta,
@@ -62,8 +62,8 @@ module port_group_avlstrm (
         .out_usr_ready          (out_usr.ready),
         .out_usr_almost_full    (out_usr.almost_full),
         .out_usr_channel        (),
-        .no_pg_rule_cnt         (no_pg_rule_cnt),
-        .pg_rule_cnt            (pg_rule_cnt)
+        .stats_no_pg_rule_cnt         (stats_no_pg_rule_cnt),
+        .stats_pg_rule_cnt            (stats_pg_rule_cnt)
     );
 
     //stats

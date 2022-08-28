@@ -611,6 +611,20 @@ always @(posedge clk_status) begin
     sm_cdc_af_status              <= sm_cdc_af_r1;
 end
 //registers
+
+
+logic [31:0] stats_readdata;
+avl_stream_if#(.WIDTH($bits(stats_t))) pg_stats_pcie();
+   
+stats_unpacker_avlstrm stats_unpacker 
+  (
+   .Clk(clk_pcie),
+   .readaddr(status_addr_r),
+   .readdata(stats_readdata),
+   .stats_in(pg_stats_pcie)
+   );
+   
+   
 always @(posedge clk_status) begin
     status_addr_r           <= status_addr[7:0];
     status_addr_sel_r       <= status_addr[29:30-STAT_AWIDTH];
@@ -647,12 +661,12 @@ always @(posedge clk_status) begin
                 REG_SM_CHECK_PKT          : status_readdata <= sm_check_pkt_status;
                 REG_SM_CHECK_PKT_SOP      : status_readdata <= sm_check_pkt_s_status;
                 REG_SM_NOCHECK_PKT        : status_readdata <= sm_nocheck_pkt_status;
-                REG_PG_PKT                : status_readdata <= pg_pkt_status;
-                REG_PG_META               : status_readdata <= pg_meta_status;
-                REG_PG_RULE               : status_readdata <= pg_rule_status;
-                REG_PG_CHECK_PKT          : status_readdata <= pg_check_pkt_status;
-                REG_PG_CHECK_PKT_SOP      : status_readdata <= pg_check_pkt_s_status;
-                REG_PG_NOCHECK_PKT        : status_readdata <= pg_nocheck_pkt_status;
+                //REG_PG_PKT                : status_readdata <= pg_pkt_status;
+                //REG_PG_META               : status_readdata <= pg_meta_status;
+                //REG_PG_RULE               : status_readdata <= pg_rule_status;
+                //REG_PG_CHECK_PKT          : status_readdata <= pg_check_pkt_status;
+                //REG_PG_CHECK_PKT_SOP      : status_readdata <= pg_check_pkt_s_status;
+                //REG_PG_NOCHECK_PKT        : status_readdata <= pg_nocheck_pkt_status;
                 REG_BYPASS_PKT            : status_readdata <= bypass_pkt_status;
                 REG_BYPASS_PKT_SOP        : status_readdata <= bypass_pkt_s_status;
                 REG_BYPASS_META           : status_readdata <= bypass_meta_status;
@@ -678,7 +692,7 @@ always @(posedge clk_status) begin
                 REG_MAX_NF2PDU            : status_readdata <= max_nf2pdu_status;
                 REG_SM_BYPASS_AF          : status_readdata <= sm_bypass_af_status;
                 REG_SM_CDC_AF             : status_readdata <= sm_cdc_af_status;
-                default                   : status_readdata <= 32'hDEADBEEF;
+                default                   : status_readdata <= stats_readdata;
             endcase
         end
     end
@@ -706,36 +720,46 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
     avl_stream_if#(.WIDTH(512)) ethernet_out2_direct();
     avl_stream_if#(.WIDTH(512)) ethernet_out3_direct();
     avl_stream_if#(.WIDTH(512)) ethernet_out4_direct();
+
     avl_stream_if#(.WIDTH(512)) r_eth_direct();
+
     avl_stream_if#(.WIDTH(512)) fifo0_in_direct();
     avl_stream_if#(.WIDTH(512)) fifo3_in_direct();
     avl_stream_if#(.WIDTH(512)) fifo4_in_direct();
     avl_stream_if#(.WIDTH(512)) fifo1_in_direct();
     avl_stream_if#(.WIDTH(512)) fifo2_in_direct();
+
     avl_stream_if#(.WIDTH(512)) dm2sm_in_pkt_direct();
     avl_stream_if#(.WIDTH($bits(metadata_t))) dm2sm_in_meta_direct();
     avl_stream_if#(.WIDTH(512)) dm2sm_in_usr_direct();
+
     avl_stream_if#(.WIDTH(512)) fpm_in_pkt_direct();
     avl_stream_if#(.WIDTH($bits(metadata_t))) fpm_in_meta_direct();
     avl_stream_if#(.WIDTH(512)) fpm_in_usr_direct();
+
     avl_stream_if#(.WIDTH(512)) sm2pg_in_pkt_direct();
     avl_stream_if#(.WIDTH($bits(metadata_t))) sm2pg_in_meta_direct();
     avl_stream_if#(.WIDTH(512)) sm2pg_in_usr_direct();
+
     avl_stream_if#(.WIDTH(512)) pg_in_pkt_direct();
     avl_stream_if#(.WIDTH($bits(metadata_t))) pg_in_meta_direct();
     avl_stream_if#(.WIDTH(512)) pg_in_usr_direct();
     avl_stream_if#(.WIDTH(512)) pg2nf_in_pkt_direct();
     avl_stream_if#(.WIDTH($bits(metadata_t))) pg2nf_in_meta_direct();
     avl_stream_if#(.WIDTH(512)) pg2nf_in_usr_direct();
+
     avl_stream_if#(.WIDTH(512)) nf_in_pkt_direct();
     avl_stream_if#(.WIDTH($bits(metadata_t))) nf_in_meta_direct();
     avl_stream_if#(.WIDTH(512)) nf_in_usr_direct();
+
     avl_stream_if#(.WIDTH(512)) by2pd_in_pkt_direct();
     avl_stream_if#(.WIDTH($bits(metadata_t))) by2pd_in_meta_direct();
     avl_stream_if#(.WIDTH(512)) by2pd_in_usr_direct();
+
     avl_stream_if#(.WIDTH(512)) dma_in_pkt_direct();
     avl_stream_if#(.WIDTH($bits(metadata_t))) dma_in_meta_direct();
     avl_stream_if#(.WIDTH(512)) dma_in_usr_direct();
+
     ethernet_multi_out_avlstrm my_ethernet (
         .Clk(clk),
         .Rst_n(rst_n),
@@ -895,9 +919,10 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .stats_out_rule(stats_out_rule_pg),
         .stats_nocheck_pkt(stats_nocheck_pkt_pg),
         .stats_check_pkt(stats_check_pkt_pg),
-        .stats_check_pkt_s(stats_check_pkt_s_pg),
-        .pg_no_pg_rule_cnt(pg_no_pg_rule_cnt_pg),
-        .pg_int_rule_cnt(pg_int_rule_cnt_pg),
+        .stats_check_pkt_sop(stats_check_pkt_s_pg),
+        .stats_no_pg_rule_cnt(pg_no_pg_rule_cnt_pg),
+        .stats_pg_rule_cnt(pg_int_rule_cnt_pg),
+        .stats_out(pg_stats_pcie),
         .in_pkt(pg_in_pkt_direct),
         .in_meta(pg_in_meta_direct),
         .in_usr(pg_in_usr_direct),

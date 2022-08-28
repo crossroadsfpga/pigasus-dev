@@ -1,7 +1,8 @@
 `ifndef STATS_REG
 `define STATS_REG
 
-parameter NUM_REG = 54;
+parameter STATS_INTERVAL = (1<<1);
+//parameter STATS_INTERVAL = (1<<7);
 
 parameter REG_IN_PKT                  = 0;
 parameter REG_OUT_PKT                 = 1;
@@ -23,15 +24,15 @@ parameter REG_DM_CHECK_PKT            = 16;
 parameter REG_SM_PKT                  = 17;
 parameter REG_SM_META                 = 18;
 parameter REG_SM_RULE                 = 19;
-parameter REG_SM_CHECK_PKT            = 20;
-parameter REG_SM_CHECK_PKT_SOP        = 21;
+parameter REG_SM_CHECK_PKT            = 20; 
+parameter REG_SM_CHECK_PKT_SOP        = 21; 
 parameter REG_SM_NOCHECK_PKT          = 22;
-parameter REG_PG_PKT                  = 23;
-parameter REG_PG_META                 = 24;
-parameter REG_PG_RULE                 = 25;
-parameter REG_PG_CHECK_PKT            = 26;
-parameter REG_PG_CHECK_PKT_SOP        = 27;
-parameter REG_PG_NOCHECK_PKT          = 28;
+parameter REG_PG_PKT                  = 23;//
+parameter REG_PG_META                 = 24;//
+parameter REG_PG_RULE                 = 25;//
+parameter REG_PG_CHECK_PKT            = 26;//
+parameter REG_PG_CHECK_PKT_SOP        = 27;//
+parameter REG_PG_NOCHECK_PKT          = 28;//
 parameter REG_BYPASS_PKT              = 29;
 parameter REG_BYPASS_PKT_SOP          = 30;
 parameter REG_BYPASS_META             = 31;
@@ -57,4 +58,9 @@ parameter REG_MAX_BYPASS2NF           = 50;
 parameter REG_MAX_NF2PDU              = 51;
 parameter REG_SM_BYPASS_AF            = 52;
 parameter REG_SM_CDC_AF               = 53;
+parameter REG_PG_NO_RULE_CNT = 54; //
+parameter REG_PG_RULE_CNT = 55; //
+
+parameter NUM_REG = 56;
+
 `endif

@@ -58,8 +58,8 @@ module port_group (
     output  logic [1:0]     out_usr_channel,
 
     //stats
-    output  logic [31:0]    no_pg_rule_cnt,
-    output  logic [31:0]    pg_rule_cnt
+    output  logic [31:0]    stats_no_pg_rule_cnt,
+    output  logic [31:0]    stats_pg_rule_cnt
 );
 
 `ifdef DUMMY_PG
@@ -295,14 +295,14 @@ end
 //Stats
 always @(posedge clk) begin
     if (rst) begin
-        no_pg_rule_cnt <= 0;
-        pg_rule_cnt <= 0;
+        stats_no_pg_rule_cnt <= 0;
+        stats_pg_rule_cnt <= 0;
     end else begin
         if (reg_rule_valid & !reg_rule_eop) begin
-            no_pg_rule_cnt <= no_pg_rule_cnt + 1;
+            stats_no_pg_rule_cnt <= stats_no_pg_rule_cnt + 1;
         end
         if (int_valid & !int_eop) begin
-            pg_rule_cnt <= pg_rule_cnt + 1;
+            stats_pg_rule_cnt <= stats_pg_rule_cnt + 1;
         end
     end
 end

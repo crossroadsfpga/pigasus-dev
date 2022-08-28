@@ -1,5 +1,6 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
+`include "./src/stats_reg.sv"
 
 module port_group_matcher_avlstrm  (
     input logic Clk, 
@@ -10,10 +11,13 @@ module port_group_matcher_avlstrm  (
     output logic [31:0]     stats_out_rule,
     output logic [31:0]     stats_nocheck_pkt,
     output logic [31:0]     stats_check_pkt,
-    output logic [31:0]     stats_check_pkt_s,
+    output logic [31:0]     stats_check_pkt_sop,
     
-    output  logic [31:0]    pg_no_pg_rule_cnt,
-    output  logic [31:0]    pg_int_rule_cnt,
+    output  logic [31:0]    stats_no_pg_rule_cnt,
+    output  logic [31:0]    stats_pg_rule_cnt,
+
+    avl_stream_if.tx stats_out,
+				    
 
     avl_stream_if.rx in_pkt,
     avl_stream_if.rx in_meta,
@@ -24,17 +28,56 @@ module port_group_matcher_avlstrm  (
     avl_stream_if.tx out_usr
 );
 
-    avl_stream_if#(.WIDTH(512))               pg_pkt_ifc();
+   stats_t stats_out_pkt_s;
+   stats_t stats_out_meta_s;
+   stats_t stats_out_rule_s;
+   stats_t stats_nocheck_pkt_s;
+   stats_t stats_check_pkt_s;
+   stats_t stats_check_pkt_sop_s;
+   stats_t stats_no_pg_rule_cnt_s;
+   stats_t stats_pg_rule_cnt_s;
+
+   assign stats_out_pkt_s.addr = REG_PG_PKT;
+   assign stats_out_meta_s.addr = REG_PG_META;
+   assign stats_out_rule_s.addr = REG_PG_RULE;
+   assign stats_nocheck_pkt_s.addr = REG_PG_NOCHECK_PKT;
+   assign stats_check_pkt_s.addr = REG_PG_CHECK_PKT;
+   assign stats_check_pkt_sop_s.addr = REG_PG_CHECK_PKT_SOP;
+   assign stats_no_pg_rule_cnt_s.addr = REG_PG_NO_RULE_CNT;
+   assign stats_pg_rule_cnt_s.addr = REG_PG_RULE_CNT;
+   
+   stats_packer_avlstrm #(8) stats_pack 
+   (
+    .Clk(Clk), 
+    .Rst_n(Rst_n),
+    
+    .stats({
+	    stats_out_pkt_s,
+	    stats_out_meta_s,
+	    stats_out_rule_s,
+	    stats_nocheck_pkt_s,
+	    stats_check_pkt_s,
+	    stats_check_pkt_sop_s,
+	    stats_no_pg_rule_cnt_s,
+	    stats_pg_rule_cnt_s
+	    }),
+    
+    .stats_out(stats_out)
+   );
+
+   
+   
+   avl_stream_if#(.WIDTH(512))               pg_pkt_ifc();
 
     port_group_avlstrm port_group_inst (
         .Clk(Clk), 
         .Rst_n(Rst_n),
     
-        .stats_out_pkt (stats_out_pkt),
-        .stats_out_meta(stats_out_meta),
-        .stats_out_rule(stats_out_rule),  
-        .no_pg_rule_cnt(pg_no_pg_rule_cnt),
-        .pg_rule_cnt(pg_int_rule_cnt),
+        .stats_out_pkt (stats_out_pkt_s.val),
+        .stats_out_meta(stats_out_meta_s.val),
+        .stats_out_rule(stats_out_rule_s.val),  
+        .stats_no_pg_rule_cnt(stats_no_pg_rule_cnt_s.val),
+        .stats_pg_rule_cnt(stats_pg_rule_cnt_s.val),
     
         .in_pkt(in_pkt),
         .in_meta(in_meta),
@@ -48,9 +91,9 @@ module port_group_matcher_avlstrm  (
         .Clk(Clk), 
         .Rst_n(Rst_n),
     
-        .stats_out_pkt0   (stats_nocheck_pkt),
-        .stats_out_pkt1   (stats_check_pkt),
-        .stats_out_pkt1_s (stats_check_pkt_s),
+        .stats_out_pkt0   (stats_nocheck_pkt_s.val),
+        .stats_out_pkt1   (stats_check_pkt_s.val),
+        .stats_out_pkt1_s (stats_check_pkt_sop_s.val),
         
         .in(pg_pkt_ifc),
         .out0(pg_nocheck),

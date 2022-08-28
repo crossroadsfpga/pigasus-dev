@@ -185,6 +185,12 @@ parameter RID_WIDTH = 16;
 parameter RULE_S_WIDTH = (RID_WIDTH + 4);
 
 typedef struct packed {
+   // magic numbers matches top level declaration; fragile
+   logic [31:0] val;
+   logic [7:0] addr;
+} stats_t;
+
+typedef struct packed {
     logic last;
     logic [2:0] bucket;
     logic [RID_WIDTH-1:0] data;
