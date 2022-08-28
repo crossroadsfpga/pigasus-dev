@@ -15,6 +15,14 @@ module channel_fifo_avlstrm #(
     output logic [31:0] stats_in_rule,
     output logic [31:0] in_pkt_fill_level,
 
+    input logic [31:0] stats_in_pkt_addr,
+    input logic [31:0] stats_in_pkt_sop_addr,
+    input logic [31:0] stats_in_meta_addr,
+    input logic [31:0] stats_in_rule_addr,
+    input logic [31:0] stats_in_pkt_max_fill_level_addr,
+
+    avl_stream_if.tx stats_out,
+
     avl_stream_if.rx in_pkt,
     avl_stream_if.rx in_meta,
     avl_stream_if.rx in_usr,
@@ -22,6 +30,51 @@ module channel_fifo_avlstrm #(
     avl_stream_if.tx out_meta,
     avl_stream_if.tx out_usr
 );
+
+   reg [31:0] 	       stats_in_pkt_max_fill_level_r;
+   always@(posedge Clk_i) begin
+      if (!Rst_n_i) begin
+	 stats_in_pkt_max_fill_level_r<=0;
+      end else begin
+	 if (stats_in_pkt_max_fill_level_r<in_pkt_fill_level) begin
+	    stats_in_pkt_max_fill_level_r<=in_pkt_fill_level;
+	 end
+      end
+   end
+   
+    stats_t stats_in_pkt_s;
+    stats_t stats_in_pkt_sop_s;
+    stats_t stats_in_meta_s;
+    stats_t stats_in_rule_s;
+    stats_t stats_in_pkt_max_fill_level_s;
+
+    assign stats_in_pkt_s.addr = stats_in_pkt_addr;
+    assign stats_in_pkt_sop_s.addr = stats_in_pkt_sop_addr;
+    assign stats_in_meta_s.addr = stats_in_meta_addr;
+    assign stats_in_rule_s.addr = stats_in_rule_addr;
+    assign stats_in_pkt_max_fill_level_s.addr = stats_in_pkt_max_fill_level_addr;
+
+    assign stats_in_pkt_s.val = stats_in_pkt;
+    assign stats_in_pkt_sop_s.val = stats_in_pkt_sop;
+    assign stats_in_meta_s.val = stats_in_meta;
+    assign stats_in_rule_s.val = stats_in_rule;
+    assign stats_in_pkt_max_fill_level_s.val = stats_in_pkt_max_fill_level_r;
+
+   stats_packer_avlstrm #(5) stats_pack 
+   (
+    .Clk(Clk_i), 
+    .Rst_n(Rst_n_i),
+    
+    .stats({
+	    stats_in_pkt_s,
+	    stats_in_pkt_sop_s,
+	    stats_in_meta_s,
+	    stats_in_rule_s,
+	    stats_in_pkt_max_fill_level_s
+	    }),
+    
+    .stats_out(stats_out)
+   );
 
 channel_fifo#(
     .DUAL_CLOCK(DUAL_CLOCK)

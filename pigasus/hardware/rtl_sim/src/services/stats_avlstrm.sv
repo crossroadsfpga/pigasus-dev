@@ -2,9 +2,10 @@
 `include "./src/struct_s.sv"
 `include "./src/stats_reg.sv"
 
-module stats_packer_avlstrm #(
-    parameter NUM_STATS = 1
-) (
+module stats_packer_avlstrm 
+  #(
+    parameter NUM_STATS = 1, ID =0
+    ) (
    input logic Clk, 
    input logic Rst_n,
 			      
@@ -21,7 +22,7 @@ module stats_packer_avlstrm #(
       stats_out.eop=0;
       stats_out.sop=0;
 
-      if ((counter==0) && (tick!=0)) begin
+      if ((counter==0) && (tick!=0) && (stats[tick-1].addr!=REG_NOTUSED)) begin
 	 stats_out.valid=1;
 	 stats_out.sop=1;
 	 stats_out.eop=1;
@@ -38,7 +39,7 @@ module stats_packer_avlstrm #(
 	    tick<=NUM_STATS;
 	 end else if ((counter==0) && (tick!=0)) begin
 	    if (stats_out.ready) begin
-	       //$display("STAT PUSH: %d %d %d %d\n", counter, tick, stats[tick-1].addr, stats[tick-1].val);
+	       //$display("STAT PUSH: %d %d %d %d\n", ID, tick, stats[tick-1].addr, stats[tick-1].val);
 	       tick<=tick-1;
 	       if (tick==1) begin
 		  counter<=1;
@@ -69,7 +70,7 @@ module stats_unpacker_avlstrm (
    assign stats_in.ready=1;
 
    always@(posedge Clk) begin
-      if (stats_in.valid) begin
+      if (stats_in.valid && (stats.addr<NUM_REG)) begin
 	 //$display("STAT POPH: %d %d\n", stats.addr, stats.val);
 	 rfile[stats.addr]<=stats.val;
       end

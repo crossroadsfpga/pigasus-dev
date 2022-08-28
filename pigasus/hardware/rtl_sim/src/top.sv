@@ -614,14 +614,48 @@ end
 
 
 logic [31:0] stats_readdata;
+avl_stream_if#(.WIDTH($bits(stats_t))) r_stats_clk();
+avl_stream_if#(.WIDTH($bits(stats_t))) dm2sm_stats_clk();
+avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats_clk();
+avl_stream_if#(.WIDTH($bits(stats_t))) sm2pg_stats_pcie();
 avl_stream_if#(.WIDTH($bits(stats_t))) pg_stats_pcie();
+avl_stream_if#(.WIDTH($bits(stats_t))) pg2nf_stats_pcie();
+avl_stream_if#(.WIDTH($bits(stats_t))) nf_stats_pcie();
+avl_stream_if#(.WIDTH($bits(stats_t))) by2pd_stats_pcie();
+
+avl_stream_if#(.WIDTH($bits(stats_t))) mux1();
+avl_stream_if#(.WIDTH($bits(stats_t))) all_stats_pcie();
+
+pkt_mux_avlstrm_3 sm2pg_pg2nf_by2pd_mux1
+  (
+   .Clk(clk_pcie), 
+   .Rst_n(rst_n_pcie),
+   
+   .in0(sm2pg_stats_pcie),
+   .in1(pg2nf_stats_pcie),
+   .in2(by2pd_stats_pcie),
+   .out(mux1)
+   );
+pkt_mux_avlstrm mux1_pg_mux
+  (
+   .Clk(clk_pcie), 
+   .Rst_n(rst_n_pcie),
+   
+   .in0(mux1),
+   .in1(pg_stats_pcie),
+   .out(all_stats_pcie)
+   );
+   
    
 stats_unpacker_avlstrm stats_unpacker 
   (
    .Clk(clk_pcie),
+   //.stats_in(pg_stats_pcie),
+   .stats_in(all_stats_pcie),
+
+   // combinational read from pci_status domain
    .readaddr(status_addr_r),
-   .readdata(stats_readdata),
-   .stats_in(pg_stats_pcie)
+   .readdata(stats_readdata)  
    );
    
    
@@ -686,10 +720,10 @@ always @(posedge clk_status) begin
                 REG_CPU_MATCH_PKT         : status_readdata <= cpu_match_pkt_status;
                 REG_CTRL                  : status_readdata <= ctrl_status;
                 REG_MAX_DM2SM             : status_readdata <= max_dm2sm_status;
-                REG_MAX_SM2PG             : status_readdata <= max_sm2pg_status;
-                REG_MAX_PG2NF             : status_readdata <= max_pg2nf_status;
+                //REG_MAX_SM2PG             : status_readdata <= max_sm2pg_status;
+                //REG_MAX_PG2NF             : status_readdata <= max_pg2nf_status;
                 REG_MAX_BYPASS2NF         : status_readdata <= max_bypass2nf_status;
-                REG_MAX_NF2PDU            : status_readdata <= max_nf2pdu_status;
+                //REG_MAX_NF2PDU            : status_readdata <= max_nf2pdu_status;
                 REG_SM_BYPASS_AF          : status_readdata <= sm_bypass_af_status;
                 REG_SM_CDC_AF             : status_readdata <= sm_cdc_af_status;
                 default                   : status_readdata <= stats_readdata;
@@ -856,7 +890,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .in(fifo2_in_direct),
         .out(ethernet_out4_direct)
     );
-    channel_fifo_avlstrm#(.DUAL_CLOCK(0)) my_dm2sm (
+   channel_fifo_avlstrm#(.DUAL_CLOCK(0)) my_dm2sm (
         .Clk_i(clk),
         .Rst_n_i(rst_n),
         .in_pkt_fill_level(in_pkt_fill_level_dm2sm),
@@ -864,6 +898,12 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .stats_in_pkt_sop(stats_in_pkt_sop_dm2sm),
         .stats_in_meta(stats_in_meta_dm2sm),
         .stats_in_rule(stats_in_rule_dm2sm),
+        .stats_out(dm2sm_stats_clk),						    
+        .stats_in_pkt_max_fill_level_addr(REG_MAX_DM2SM),
+        .stats_in_pkt_addr(REG_NOTUSED),
+        .stats_in_pkt_sop_addr(REG_NOTUSED),
+        .stats_in_meta_addr(REG_NOTUSED),
+        .stats_in_rule_addr(REG_NOTUSED),
         .in_pkt(dm2sm_in_pkt_direct),
         .in_meta(dm2sm_in_meta_direct),
         .in_usr(dm2sm_in_usr_direct),
@@ -904,6 +944,12 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .stats_in_pkt_sop(stats_in_pkt_sop_sm2pg),
         .stats_in_meta(stats_in_meta_sm2pg),
         .stats_in_rule(stats_in_rule_sm2pg),
+        .stats_out(sm2pg_stats_pcie),						    
+        .stats_in_pkt_max_fill_level_addr(REG_MAX_SM2PG),
+        .stats_in_pkt_addr(REG_NOTUSED),
+        .stats_in_pkt_sop_addr(REG_NOTUSED),
+        .stats_in_meta_addr(REG_NOTUSED),
+        .stats_in_rule_addr(REG_NOTUSED),
         .in_pkt(sm2pg_in_pkt_direct),
         .in_meta(sm2pg_in_meta_direct),
         .in_usr(sm2pg_in_usr_direct),
@@ -939,6 +985,12 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .stats_in_pkt_sop(stats_in_pkt_sop_pg2nf),
         .stats_in_meta(stats_in_meta_pg2nf),
         .stats_in_rule(stats_in_rule_pg2nf),
+        .stats_out(pg2nf_stats_pcie),						    
+        .stats_in_pkt_max_fill_level_addr(REG_MAX_PG2NF),
+        .stats_in_pkt_addr(REG_NOTUSED),
+        .stats_in_pkt_sop_addr(REG_NOTUSED),
+        .stats_in_meta_addr(REG_NOTUSED),
+        .stats_in_rule_addr(REG_NOTUSED),
         .in_pkt(pg2nf_in_pkt_direct),
         .in_meta(pg2nf_in_meta_direct),
         .in_usr(pg2nf_in_usr_direct),
@@ -983,6 +1035,12 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .stats_in_pkt_sop(stats_in_pkt_sop_by2pd),
         .stats_in_meta(stats_in_meta_by2pd),
         .stats_in_rule(stats_in_rule_by2pd),
+        .stats_out(by2pd_stats_pcie),						    
+        .stats_in_pkt_max_fill_level_addr(REG_MAX_NF2PDU),
+        .stats_in_pkt_addr(REG_NOTUSED),
+        .stats_in_pkt_sop_addr(REG_NOTUSED),
+        .stats_in_meta_addr(REG_NOTUSED),
+        .stats_in_rule_addr(REG_NOTUSED),
         .in_pkt(by2pd_in_pkt_direct),
         .in_meta(by2pd_in_meta_direct),
         .in_usr(by2pd_in_usr_direct),

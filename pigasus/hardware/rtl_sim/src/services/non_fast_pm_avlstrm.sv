@@ -71,6 +71,12 @@ bypass_front_avlstrm bypass_nf_front_inst(
 );
 
 ////////////////////// Bypass channel //////////////////////////////////
+avl_stream_if#(.WIDTH($bits(stats_t)))stub[3]();
+assign stub[0].tx.ready=0;
+assign stub[1].tx.ready=0;
+assign stub[2].tx.ready=0;
+   
+
 channel_fifo_avlstrm #(
     .DUAL_CLOCK (0)
 ) bypass_FIFO(
@@ -83,6 +89,13 @@ channel_fifo_avlstrm #(
     .stats_in_rule(stats_bypass_rule),
     .in_pkt_fill_level(bypass_fill_level),
 
+    .stats_out(stub[0]),
+        .stats_in_pkt_max_fill_level_addr(3),
+        .stats_in_pkt_addr(4),
+        .stats_in_pkt_sop_addr(5),
+        .stats_in_meta_addr(6),
+        .stats_in_rule_addr(7),
+		
     .in_pkt(bypass_pkt_ifc),
     .in_meta(bypass_meta_ifc),
     .in_usr(bypass_rule_ifc),
@@ -99,6 +112,14 @@ channel_fifo_avlstrm #(
     .Rst_n_i(Rst_n),
 
     .in_pkt_fill_level(bypass2nf_fill_level),
+
+    .stats_out(stub[1]),
+
+        .stats_in_pkt_max_fill_level_addr(8),
+        .stats_in_pkt_addr(9),
+        .stats_in_pkt_sop_addr(10),
+        .stats_in_meta_addr(11),
+        .stats_in_rule_addr(12),
 
     .in_pkt  (nf_in_pkt_ifc),
     .in_meta (nf_in_meta_ifc),
@@ -150,6 +171,14 @@ channel_fifo_avlstrm #(
     .Rst_n_i(Rst_n),
 
     .in_pkt_fill_level(nf2bypass_fill_level),
+
+    .stats_out(stub[2]),
+
+        .stats_in_pkt_max_fill_level_addr(13),
+        .stats_in_pkt_addr(14),
+        .stats_in_pkt_sop_addr(15),
+        .stats_in_meta_addr(16),
+        .stats_in_rule_addr(17),
 
     .in_pkt(nf_check_pkt_ifc),
     .in_meta(nf_meta_ifc),

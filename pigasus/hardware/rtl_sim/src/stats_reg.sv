@@ -51,16 +51,15 @@ parameter REG_DMA_PKT                 = 43;
 parameter REG_CPU_NOMATCH_PKT         = 44;
 parameter REG_CPU_MATCH_PKT           = 45;
 parameter REG_CTRL                    = 46;
-parameter REG_MAX_DM2SM               = 47;
-parameter REG_MAX_SM2PG               = 48;
-parameter REG_MAX_PG2NF               = 49;
+parameter REG_MAX_DM2SM               = 47;//
+parameter REG_MAX_SM2PG               = 48;//
+parameter REG_MAX_PG2NF               = 49;//
 parameter REG_MAX_BYPASS2NF           = 50;
-parameter REG_MAX_NF2PDU              = 51;
+parameter REG_MAX_NF2PDU              = 51;//
 parameter REG_SM_BYPASS_AF            = 52;
 parameter REG_SM_CDC_AF               = 53;
-parameter REG_PG_NO_RULE_CNT = 54; //
-parameter REG_PG_RULE_CNT = 55; //
 
-parameter NUM_REG = 56;
+parameter NUM_REG = 54;
+parameter REG_NOTUSED = NUM_REG;
 
 `endif
