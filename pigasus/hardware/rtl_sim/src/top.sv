@@ -620,12 +620,25 @@ avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats_clk();
 avl_stream_if#(.WIDTH($bits(stats_t))) sm2pg_stats_pcie();//
 avl_stream_if#(.WIDTH($bits(stats_t))) pg_stats_pcie();//
 avl_stream_if#(.WIDTH($bits(stats_t))) pg2nf_stats_pcie();//
-avl_stream_if#(.WIDTH($bits(stats_t))) nf_stats_pcie();
+avl_stream_if#(.WIDTH($bits(stats_t))) nf_stats_pcie();//
 avl_stream_if#(.WIDTH($bits(stats_t))) by2pd_stats_pcie();//
 
 avl_stream_if#(.WIDTH($bits(stats_t))) mux1();
+avl_stream_if#(.WIDTH($bits(stats_t))) mux2();
+avl_stream_if#(.WIDTH($bits(stats_t))) stats_clk2pcie();
 avl_stream_if#(.WIDTH($bits(stats_t))) all_stats_pcie();
 
+unified_pkt_fifo_avlstrm#(.DUAL_CLOCK(1), .MEM_TYPE("Auto"), .FIFO_DEPTH(16)) stats_slowing 
+  (
+   .Clk_i(clk),
+   .Rst_n_i(rst_n),
+   .Clk_o(clk_pcie),
+   .Rst_n_o(rst_n_pcie),
+
+   .in(dm2sm_stats_clk),
+   .out(stats_clk2pcie)
+   );
+   
 pkt_mux_avlstrm_3 sm2pg_pg2nf_by2pd_mux1
   (
    .Clk(clk_pcie), 
@@ -637,14 +650,24 @@ pkt_mux_avlstrm_3 sm2pg_pg2nf_by2pd_mux1
    .out(mux1)
    );
 
-pkt_mux_avlstrm_3 mux1_pg_nf_mux
+pkt_mux_avlstrm pg_nf_mux
+  (
+   .Clk(clk_pcie), 
+   .Rst_n(rst_n_pcie),
+   
+   .in0(pg_stats_pcie),
+   .in1(nf_stats_pcie),
+   .out(mux2)
+   );
+
+pkt_mux_avlstrm_3 stats_mux
   (
    .Clk(clk_pcie), 
    .Rst_n(rst_n_pcie),
    
    .in0(mux1),
-   .in1(pg_stats_pcie),
-   .in2(nf_stats_pcie),
+   .in1(mux2),
+   .in2(stats_clk2pcie),
    .out(all_stats_pcie)
    );
    
@@ -652,7 +675,6 @@ pkt_mux_avlstrm_3 mux1_pg_nf_mux
 stats_unpacker_avlstrm stats_unpacker 
   (
    .Clk(clk_pcie),
-   //.stats_in(pg_stats_pcie),
    .stats_in(all_stats_pcie),
 
    // combinational read from pci_status domain
@@ -721,7 +743,7 @@ always @(posedge clk_status) begin
                 REG_CPU_NOMATCH_PKT       : status_readdata <= cpu_nomatch_pkt_status;
                 REG_CPU_MATCH_PKT         : status_readdata <= cpu_match_pkt_status;
                 REG_CTRL                  : status_readdata <= ctrl_status;
-                REG_MAX_DM2SM             : status_readdata <= max_dm2sm_status;
+                //REG_MAX_DM2SM             : status_readdata <= max_dm2sm_status;
                 //REG_MAX_SM2PG             : status_readdata <= max_sm2pg_status;
                 //REG_MAX_PG2NF             : status_readdata <= max_pg2nf_status;
                 REG_MAX_BYPASS2NF         : status_readdata <= max_bypass2nf_status;
