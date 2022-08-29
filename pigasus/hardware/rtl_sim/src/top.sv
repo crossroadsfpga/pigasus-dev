@@ -653,26 +653,26 @@ unified_pkt_fifo_avlstrm#(.DUAL_CLOCK(1), .MEM_TYPE("Auto"), .FIFO_DEPTH(16)) st
    .in(mux__clk),
    .out(stats__clk2pcie)
    );
-   
-pkt_mux_avlstrm sm2pg_dma_mux1
+
+pkt_mux_avlstrm sm2pg_dma_mux11
   (
    .Clk(clk_pcie), 
    .Rst_n(rst_n_pcie),
    
    .in0(sm2pg_stats__pcie),
    .in1(dma_stats__pcie),
-   .out(mux1__pcie)
+   .out(mux11__pcie)
    );
-
-pkt_mux_avlstrm_3 mux1_pg2nf_by2pd_mux11
+   
+pkt_mux_avlstrm_3 mux1_pg2nf_by2pd_mux1
   (
    .Clk(clk_pcie), 
    .Rst_n(rst_n_pcie),
    
-   .in0(mux1__pcie),
+   .in0(mux11__pcie),
    .in1(pg2nf_stats__pcie),
    .in2(by2pd_stats__pcie),
-   .out(mux11__pcie)
+   .out(mux1__pcie)
    );
 
 pkt_mux_avlstrm_3 pg_nf_mux2
@@ -691,7 +691,7 @@ pkt_mux_avlstrm_3 stats_mux
    .Clk(clk_pcie), 
    .Rst_n(rst_n_pcie),
    
-   .in0(mux11__pcie),
+   .in0(mux1__pcie),
    .in1(mux2__pcie),
    .in2(stats__clk2pcie),
    .out(all_stats__pcie)
@@ -772,7 +772,7 @@ always @(posedge clk_status) begin
                 //REG_MAX_DM2SM             : status_readdata <= max_dm2sm_status;
                 //REG_MAX_SM2PG             : status_readdata <= max_sm2pg_status;
                 //REG_MAX_PG2NF             : status_readdata <= max_pg2nf_status;
-                REG_MAX_BYPASS2NF         : status_readdata <= max_bypass2nf_status;
+                //REG_MAX_BYPASS2NF         : status_readdata <= max_bypass2nf_status;
                 //REG_MAX_NF2PDU            : status_readdata <= max_nf2pdu_status;
                 //REG_SM_BYPASS_AF          : status_readdata <= sm_bypass_af_status;
                 //REG_SM_CDC_AF             : status_readdata <= sm_cdc_af_status;

@@ -22,7 +22,7 @@ localparam data_width = 528;
 localparam lo = 0;  
 localparam hi = `PKT_FILE_NB_LINES;  //filtered ack_128 pkts
 
-localparam stop = (hi*2*1.25+20000+10000);  // Tune simulation length
+localparam stop = (hi*2*1.25+20000);  // Tune simulation length
 localparam nf_forward_threshold = 200;
 
 logic  clk_status;

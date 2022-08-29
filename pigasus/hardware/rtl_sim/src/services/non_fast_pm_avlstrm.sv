@@ -37,9 +37,10 @@ module non_fast_pm_avlstrm (
     avl_stream_if.tx out_usr
 );
 
-   reg 			stats_bypass_max_fill_level_r;
-   reg 			stats_bypass2nf_max_fill_level_r;
-   reg 			stats_nf2bypass_max_fill_level_r;
+   reg [31:0] stats_bypass_max_fill_level_r;
+   reg [31:0] stats_bypass2nf_max_fill_level_r;
+   reg [31:0] stats_nf2bypass_max_fill_level_r;
+   
    always@(posedge Clk) begin
       if (!Rst_n) begin
   	 stats_bypass_max_fill_level_r<=0;

@@ -39,7 +39,7 @@ module stats_packer_avlstrm
 	    tick<=NUM_STATS;
 	 end else if ((counter==0) && (tick!=0)) begin
 	    if (stats_out.ready) begin
-	       //$display("STAT PUSH: %d %d %d %d\n", ID, tick, stats[tick-1].addr, stats[tick-1].val);
+	       //$display("STAT PUSH: %d %d\n", stats[tick-1].addr, stats[tick-1].val);
 	       tick<=tick-1;
 	       if (tick==1) begin
 		  counter<=1;
