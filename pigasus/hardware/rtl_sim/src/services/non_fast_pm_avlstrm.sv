@@ -26,6 +26,7 @@ module non_fast_pm_avlstrm (
     output logic [31:0] nf_max_pkt_fifo,
     output logic [31:0] nf_max_rule_fifo,
 
+    // stats channel			    
     avl_stream_if.tx stats_out,
 			    
     avl_stream_if.rx in_pkt,

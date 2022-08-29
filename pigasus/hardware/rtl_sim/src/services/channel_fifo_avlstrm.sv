@@ -9,6 +9,16 @@ module channel_fifo_avlstrm #(
     input logic Clk_o, 
     input logic Rst_n_o,
 
+    avl_stream_if.rx in_pkt,
+    avl_stream_if.rx in_meta,
+    avl_stream_if.rx in_usr,
+    avl_stream_if.tx out_pkt,
+    avl_stream_if.tx out_meta,
+    avl_stream_if.tx out_usr,
+
+    // stats channel			    
+    avl_stream_if.tx stats_out,
+
     output logic [31:0] stats_in_pkt,
     output logic [31:0] stats_in_pkt_sop,
     output logic [31:0] stats_in_meta,
@@ -19,16 +29,7 @@ module channel_fifo_avlstrm #(
     input logic [31:0] stats_in_pkt_sop_addr,
     input logic [31:0] stats_in_meta_addr,
     input logic [31:0] stats_in_rule_addr,
-    input logic [31:0] stats_in_pkt_max_fill_level_addr,
-
-    avl_stream_if.tx stats_out,
-
-    avl_stream_if.rx in_pkt,
-    avl_stream_if.rx in_meta,
-    avl_stream_if.rx in_usr,
-    avl_stream_if.tx out_pkt,
-    avl_stream_if.tx out_meta,
-    avl_stream_if.tx out_usr
+    input logic [31:0] stats_in_pkt_max_fill_level_addr
 );
 
    reg [31:0] 	       stats_in_pkt_max_fill_level_r;

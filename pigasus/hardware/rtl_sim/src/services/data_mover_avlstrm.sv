@@ -3,16 +3,7 @@
 
 module data_mover_avlstrm (
     input logic Clk, 
-   input logic Rst_n,
-    output logic [31:0]                 stats_in_meta,
-    output logic [31:0]                 stats_out_meta,
-    output logic [31:0]                 stats_in_forward_meta,
-    output logic [31:0]                 stats_in_drop_meta,
-    output logic [31:0]                 stats_in_check_meta,
-    output logic [31:0]                 stats_in_ooo_meta,
-    output logic [31:0]                 stats_in_forward_ooo_meta,
-    output logic [31:0]                 stats_nopayload_pkt,
-    output logic [31:0]                 stats_check_pkt,
+    input logic Rst_n,
 
     output  logic [PKTBUF_AWIDTH-1:0]   pkt_buffer_address,
     output  logic                    pkt_buffer_read,
@@ -23,7 +14,17 @@ module data_mover_avlstrm (
     avl_stream_if.tx pkt,
     avl_stream_if.tx check_pkt,
     avl_stream_if.tx check_meta,
-    avl_stream_if.tx emptylist
+    avl_stream_if.tx emptylist,
+
+    output logic [31:0]                 stats_in_meta,
+    output logic [31:0]                 stats_out_meta,
+    output logic [31:0]                 stats_in_forward_meta,
+    output logic [31:0]                 stats_in_drop_meta,
+    output logic [31:0]                 stats_in_check_meta,
+    output logic [31:0]                 stats_in_ooo_meta,
+    output logic [31:0]                 stats_in_forward_ooo_meta,
+    output logic [31:0]                 stats_nopayload_pkt,
+    output logic [31:0]                 stats_check_pkt
 );
 
     data_mover data_mover_inst (

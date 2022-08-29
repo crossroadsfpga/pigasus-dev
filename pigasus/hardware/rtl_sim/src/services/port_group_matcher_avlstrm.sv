@@ -16,6 +16,7 @@ module port_group_matcher_avlstrm  (
     output  logic [31:0]    stats_no_pg_rule_cnt,
     output  logic [31:0]    stats_pg_rule_cnt,
 
+    // stats channel			    
     avl_stream_if.tx stats_out,
 
     avl_stream_if.rx in_pkt,

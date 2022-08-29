@@ -7,8 +7,6 @@ module ethernet_avlstrm
    input logic 		 Clk, 
    input logic 		 Rst_n,
    
-   avl_stream_if.tx stats_out,
-
    output logic 	 out_valid,
    input logic 		 out_ready,
    output logic [511: 0] out_data,
@@ -24,8 +22,11 @@ module ethernet_avlstrm
    input logic 		 in_valid,
    output logic 	 in_ready,
 			 
-			 avl_stream_if.tx in,
-			 avl_stream_if.rx out
+   avl_stream_if.tx in,
+   avl_stream_if.rx out,
+
+   // stats channel			    
+   avl_stream_if.tx stats_out
 );
 
 logic [31:0]    in_pkt;

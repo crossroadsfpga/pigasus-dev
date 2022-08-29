@@ -11,7 +11,19 @@ module fast_pm_avlstrm
     input logic 	Clk_back, 
     input logic 	Rst_back_n,
 
-   // Clk_back domain
+   avl_stream_if.rx in_pkt,
+   avl_stream_if.rx in_meta,
+   avl_stream_if.rx in_usr,
+   avl_stream_if.tx fp_nocheck,
+   avl_stream_if.tx out_pkt,
+   avl_stream_if.tx out_meta,
+   avl_stream_if.tx out_usr,
+
+    // stats channel			    
+    avl_stream_if.tx stats_out,
+    avl_stream_if.tx stats_out_back,
+   
+    // Clk_back domain
     output logic [31:0] stats_out_pkt,
     output logic [31:0] stats_out_meta,
     output logic [31:0] stats_out_rule,
@@ -19,20 +31,9 @@ module fast_pm_avlstrm
     output logic [31:0] stats_check_pkt,
     output logic [31:0] stats_check_pkt_sop,
 			
-   // Clk domain
+    // Clk domain
     output logic [31:0] sm_bypass_af,
-    output logic [31:0] sm_cdc_af,
-   
-   avl_stream_if.tx stats_out,
-   avl_stream_if.tx stats_out_back,
-   
-   avl_stream_if.rx in_pkt,
-   avl_stream_if.rx in_meta,
-   avl_stream_if.rx in_usr,
-   avl_stream_if.tx fp_nocheck,
-   avl_stream_if.tx out_pkt,
-   avl_stream_if.tx out_meta,
-   avl_stream_if.tx out_usr
+    output logic [31:0] sm_cdc_af
    );
 
     stats_t stats_out_pkt_s;

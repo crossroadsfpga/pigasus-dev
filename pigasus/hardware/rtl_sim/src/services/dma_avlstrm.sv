@@ -20,8 +20,6 @@ module dma_avlstrm (
     output   logic                   pdumeta_cpu_ready,
     output  logic [31:0]            pdumeta_cpu_csr_readdata,
 
-    avl_stream_if.tx stats_out,
-
     // DRAM
     output  ddr_wr_t                ddr_wr_req_data,
     output  logic                   ddr_wr_req_valid,
@@ -36,7 +34,10 @@ module dma_avlstrm (
     avl_stream_if.rx in_pkt,
     avl_stream_if.rx in_meta,
     avl_stream_if.rx in_usr,
-    avl_stream_if.tx nomatch_pkt
+    avl_stream_if.tx nomatch_pkt,
+
+    // stats channel			    
+    avl_stream_if.tx stats_out
 );
 
    logic [31:0] 		    dma_pkt;

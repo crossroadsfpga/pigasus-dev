@@ -16,6 +16,15 @@ module reassembler_avlstrm (
     input   logic                       pkt_buffer_readvalid,
     input   flit_t                      pkt_buffer_readdata,    
 
+    avl_stream_if.rx eth, 
+    avl_stream_if.tx nopayload,
+    avl_stream_if.tx out_pkt,
+    avl_stream_if.tx out_usr,
+    avl_stream_if.tx out_meta,
+
+    // stats channel			    
+    avl_stream_if.tx stats_out,
+
     output logic [31:0]                 parser_meta_csr_readdata,
     output logic [31:0]                 stats_incomp_out_meta,
     output logic [31:0]                 stats_parser_out_meta,
@@ -31,15 +40,7 @@ module reassembler_avlstrm (
     output logic [31:0]                 stats_dm_in_ooo_meta,
     output logic [31:0]                 stats_dm_in_forward_ooo_meta,
     output logic [31:0]                 stats_nopayload_pkt,
-    output logic [31:0]                 stats_dm_check_pkt,
-
-    avl_stream_if.tx stats_out,
-
-    avl_stream_if.rx eth, 
-    avl_stream_if.tx nopayload,
-    avl_stream_if.tx out_pkt,
-    avl_stream_if.tx out_usr,
-    avl_stream_if.tx out_meta
+    output logic [31:0]                 stats_dm_check_pkt
 );
 
    stats_t parser_meta_csr_readdata_s;
