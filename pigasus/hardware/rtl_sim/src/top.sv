@@ -68,7 +68,7 @@ module top (
    //
    // begin stats section
    //
-   logic [31:0] stats_unpackdata;
+   logic [31:0] 	   stats_unpackdata;
    
    avl_stream_if#(.WIDTH($bits(stats_t))) eth_stats__clk();
    avl_stream_if#(.WIDTH($bits(stats_t))) r_stats__clk();
@@ -139,6 +139,13 @@ module top (
       .out(all_stats__pcie)
       );
    
+   logic [31:0] 	   ctrl_status;
+   logic [7:0] status_addr_r;
+   logic [STAT_AWIDTH-1:0] status_addr_sel_r;
+   logic                   status_write_r;
+   logic                   status_read_r;
+   logic [31:0] 	   status_writedata_r;
+
    stats_unpacker_avlstrm stats_unpacker 
      (
       .Clk(clk_pcie),
@@ -187,6 +194,9 @@ module top (
    // begin datapath section
    //
    
+logic internal_rb_update_valid;
+logic [31:0] pdumeta_cpu_csr_readdata;
+
 assign pcie_rb_update_valid = disable_pcie ? 1'b0 : internal_rb_update_valid;
 assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
 
