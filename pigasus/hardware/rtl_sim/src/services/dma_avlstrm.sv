@@ -1,5 +1,6 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
+`include "./src/stats_reg.sv"
 
 module dma_avlstrm (
     input logic Clk, 
@@ -19,6 +20,8 @@ module dma_avlstrm (
     output   logic                   pdumeta_cpu_ready,
     output  logic [31:0]            pdumeta_cpu_csr_readdata,
 
+    avl_stream_if.tx stats_out,
+
     // DRAM
     output  ddr_wr_t                ddr_wr_req_data,
     output  logic                   ddr_wr_req_valid,
@@ -36,28 +39,80 @@ module dma_avlstrm (
     avl_stream_if.tx nomatch_pkt
 );
 
-    logic [511:0]  pdu_gen_data;
-    logic          pdu_gen_sop;
-    logic          pdu_gen_eop;
-    logic [5:0]    pdu_gen_empty;
-    logic          pdu_gen_valid;
-    logic          pdu_gen_ready;
-    logic          pdu_gen_almost_full;
-    pdu_metadata_t pdumeta_gen_data;
-    logic          pdumeta_gen_valid;
-    logic          pdumeta_gen_ready;
-    logic [PDUID_WIDTH-1:0] pdu_emptylist_out_data;
-    logic                   pdu_emptylist_out_valid;
-    logic                   pdu_emptylist_out_ready;
+   logic [31:0] 		    dma_pkt;
+   logic [31:0] 		    cpu_nomatch_pkt;
+   logic [31:0] 		    cpu_match_pkt;
+
+
+   //PCIe clock domain
+   pdu_metadata_t tmp_pdumeta_cpu_data;
+   assign tmp_pdumeta_cpu_data = pdumeta_cpu_data;
+   always @(posedge Clk) begin
+      if (!Rst_n) begin
+         dma_pkt <= 0;
+         cpu_nomatch_pkt <= 0;
+         cpu_match_pkt <= 0;
+      end else begin
+         if (pcie_rb_update_valid) begin
+            dma_pkt <= dma_pkt + 1;
+         end
+         if (pdumeta_cpu_valid & pdumeta_cpu_ready & (tmp_pdumeta_cpu_data.action == ACTION_NOMATCH)) begin
+            cpu_nomatch_pkt <= cpu_nomatch_pkt + 1;
+         end
+         if (pdumeta_cpu_valid & pdumeta_cpu_ready & (tmp_pdumeta_cpu_data.action == ACTION_MATCH)) begin
+            cpu_match_pkt <= cpu_match_pkt + 1;
+         end
+      end
+   end
+   
+   stats_t dma_pkt_s;
+   stats_t cpu_nomatch_pkt_s;
+   stats_t cpu_match_pkt_s;
+
+   assign dma_pkt_s.addr = REG_DMA_PKT;
+   assign cpu_nomatch_pkt_s.addr = REG_CPU_NOMATCH_PKT;
+   assign cpu_match_pkt_s.addr = REG_CPU_MATCH_PKT;
+
+   assign dma_pkt_s.val = dma_pkt;
+   assign cpu_nomatch_pkt_s.val = cpu_nomatch_pkt;
+   assign cpu_match_pkt_s.val = cpu_match_pkt;
+
+   stats_packer_avlstrm #(3) stats_pack 
+   (
+    .Clk(Clk), 
+    .Rst_n(Rst_n),
     
-    pdu_metadata_t pdumeta_cpu_fifo_data;
-    logic          pdumeta_cpu_fifo_valid;
-    logic          pdumeta_cpu_fifo_ready;
+    .stats({
+	     dma_pkt_s,
+	     cpu_nomatch_pkt_s,
+	     cpu_match_pkt_s
+	    }),
     
-    logic [511:0]  ddr_rd_resp_fifo_data;
-    logic          ddr_rd_resp_fifo_valid;
-    logic          ddr_rd_resp_fifo_ready;
-    logic [31:0]   ddr_rd_resp_csr_readdata;
+    .stats_out(stats_out)
+   );
+
+   logic [511:0]  pdu_gen_data;
+   logic          pdu_gen_sop;
+   logic          pdu_gen_eop;
+   logic [5:0] 	  pdu_gen_empty;
+   logic          pdu_gen_valid;
+   logic          pdu_gen_ready;
+   logic 	  pdu_gen_almost_full;
+   pdu_metadata_t pdumeta_gen_data;
+   logic 	  pdumeta_gen_valid;
+   logic 	   pdumeta_gen_ready;
+   logic [PDUID_WIDTH-1:0] pdu_emptylist_out_data;
+   logic                   pdu_emptylist_out_valid;
+   logic                   pdu_emptylist_out_ready;
+   
+   pdu_metadata_t pdumeta_cpu_fifo_data;
+   logic 		   pdumeta_cpu_fifo_valid;
+   logic 		   pdumeta_cpu_fifo_ready;
+   
+   logic [511:0] 	   ddr_rd_resp_fifo_data;
+   logic 		   ddr_rd_resp_fifo_valid;
+   logic 		   ddr_rd_resp_fifo_ready;
+   logic [31:0] 	   ddr_rd_resp_csr_readdata;
 
 pdu_gen pdu_gen_inst(
     .clk                    (Clk),
