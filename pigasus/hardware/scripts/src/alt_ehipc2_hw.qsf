@@ -419,6 +419,7 @@ set_global_assignment -name SYSTEMVERILOG_FILE src/services/bypass_front_avlstrm
 set_global_assignment -name SYSTEMVERILOG_FILE src/services/bypass_back_avlstrm.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/services/arb_2_avlstrm.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/services/arb_2_af_avlstrm.sv
+set_global_assignment -name SYSTEMVERILOG_FILE src/services/stats_avlstrm.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/reassembly/para_Q.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/reassembly/linked_list.sv
 set_global_assignment -name SYSTEMVERILOG_FILE src/reassembly/hash_func.sv
