@@ -613,100 +613,84 @@ end
 //registers
 
 
-logic [31:0] stats_readdata;
-avl_stream_if#(.WIDTH($bits(stats_t))) r_stats__clk();
-avl_stream_if#(.WIDTH($bits(stats_t))) dm2sm_stats__clk();//
-avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats__clk();
-avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats__pcie();
-avl_stream_if#(.WIDTH($bits(stats_t))) sm2pg_stats__pcie();//
-avl_stream_if#(.WIDTH($bits(stats_t))) pg_stats__pcie();//
-avl_stream_if#(.WIDTH($bits(stats_t))) pg2nf_stats__pcie();//
-avl_stream_if#(.WIDTH($bits(stats_t))) nf_stats__pcie();//
-avl_stream_if#(.WIDTH($bits(stats_t))) by2pd_stats__pcie();//
-avl_stream_if#(.WIDTH($bits(stats_t))) dma_stats__pcie();//
-
-avl_stream_if#(.WIDTH($bits(stats_t))) mux__clk();
-avl_stream_if#(.WIDTH($bits(stats_t))) mux11__pcie();
-avl_stream_if#(.WIDTH($bits(stats_t))) mux1__pcie();
-avl_stream_if#(.WIDTH($bits(stats_t))) mux2__pcie();
-avl_stream_if#(.WIDTH($bits(stats_t))) stats__clk2pcie();
-avl_stream_if#(.WIDTH($bits(stats_t))) all_stats__pcie();
-
-pkt_mux_avlstrm_3 r_dm2sm_fpm_mux
-  (
-   .Clk(clk), 
-   .Rst_n(rst_n),
+   logic [31:0] stats_readdata;
    
-   .in0(r_stats__clk),
-   .in1(dm2sm_stats__clk),
-   .in2(fpm_stats__clk),
-   .out(mux__clk)
-   );
-
-unified_pkt_fifo_avlstrm#(.DUAL_CLOCK(1), .MEM_TYPE("Auto"), .FIFO_DEPTH(16)) stats_slowing 
-  (
-   .Clk_i(clk),
-   .Rst_n_i(rst_n),
-   .Clk_o(clk_pcie),
-   .Rst_n_o(rst_n_pcie),
-
-   .in(mux__clk),
-   .out(stats__clk2pcie)
-   );
-
-pkt_mux_avlstrm sm2pg_dma_mux11
-  (
-   .Clk(clk_pcie), 
-   .Rst_n(rst_n_pcie),
+   avl_stream_if#(.WIDTH($bits(stats_t))) r_stats__clk();
+   avl_stream_if#(.WIDTH($bits(stats_t))) dm2sm_stats__clk();//
+   avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats__clk();
+   avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats__pcie();
+   avl_stream_if#(.WIDTH($bits(stats_t))) sm2pg_stats__pcie();//
+   avl_stream_if#(.WIDTH($bits(stats_t))) pg_stats__pcie();//
+   avl_stream_if#(.WIDTH($bits(stats_t))) pg2nf_stats__pcie();//
+   avl_stream_if#(.WIDTH($bits(stats_t))) nf_stats__pcie();//
+   avl_stream_if#(.WIDTH($bits(stats_t))) by2pd_stats__pcie();//
+   avl_stream_if#(.WIDTH($bits(stats_t))) dma_stats__pcie();//
    
-   .in0(sm2pg_stats__pcie),
-   .in1(dma_stats__pcie),
-   .out(mux11__pcie)
-   );
+   avl_stream_if#(.WIDTH($bits(stats_t))) mux__clk();
+   avl_stream_if#(.WIDTH($bits(stats_t))) mux11__pcie();
+   avl_stream_if#(.WIDTH($bits(stats_t))) mux1__pcie();
+   avl_stream_if#(.WIDTH($bits(stats_t))) mux2__pcie();
+   avl_stream_if#(.WIDTH($bits(stats_t))) stats__clk2pcie();
+   avl_stream_if#(.WIDTH($bits(stats_t))) all_stats__pcie();
    
-pkt_mux_avlstrm_3 mux1_pg2nf_by2pd_mux1
-  (
-   .Clk(clk_pcie), 
-   .Rst_n(rst_n_pcie),
+   pkt_mux_avlstrm_3 r_dm2sm_fpm_mux
+     (
+      .Clk(clk), .Rst_n(rst_n),
+      .in0(r_stats__clk), .in1(dm2sm_stats__clk), .in2(fpm_stats__clk),
+      .out(mux__clk)
+      );
    
-   .in0(mux11__pcie),
-   .in1(pg2nf_stats__pcie),
-   .in2(by2pd_stats__pcie),
-   .out(mux1__pcie)
-   );
-
-pkt_mux_avlstrm_3 pg_nf_mux2
-  (
-   .Clk(clk_pcie), 
-   .Rst_n(rst_n_pcie),
+   unified_pkt_fifo_avlstrm#(.DUAL_CLOCK(1), .MEM_TYPE("Auto"), .FIFO_DEPTH(16)) stats_slowing 
+     ( 
+       .Clk_i(clk), .Rst_n_i(rst_n),
+       .Clk_o(clk_pcie), .Rst_n_o(rst_n_pcie),
+       
+       .in(mux__clk), .out(stats__clk2pcie)
+       );
    
-   .in0(pg_stats__pcie),
-   .in1(nf_stats__pcie),
-   .in2(fpm_stats__pcie),
-   .out(mux2__pcie)
-   );
-
-pkt_mux_avlstrm_3 stats_mux
-  (
-   .Clk(clk_pcie), 
-   .Rst_n(rst_n_pcie),
+   pkt_mux_avlstrm sm2pg_dma_mux11
+     (
+      .Clk(clk_pcie), .Rst_n(rst_n_pcie),
+      
+      .in0(sm2pg_stats__pcie), .in1(dma_stats__pcie),
+      .out(mux11__pcie)
+      );
    
-   .in0(mux1__pcie),
-   .in1(mux2__pcie),
-   .in2(stats__clk2pcie),
-   .out(all_stats__pcie)
-   );
+   pkt_mux_avlstrm_3 mux1_pg2nf_by2pd_mux1
+     (
+      .Clk(clk_pcie), 
+      .Rst_n(rst_n_pcie),
+      
+      .in0(mux11__pcie), .in1(pg2nf_stats__pcie), .in2(by2pd_stats__pcie),
+      .out(mux1__pcie)
+      );
+   
+   pkt_mux_avlstrm_3 pg_nf_mux2
+     (
+      .Clk(clk_pcie), .Rst_n(rst_n_pcie),
+      
+      .in0(pg_stats__pcie), .in1(nf_stats__pcie), .in2(fpm_stats__pcie),
+      .out(mux2__pcie)
+      );
+   
+   pkt_mux_avlstrm_3 stats_mux
+     (
+      .Clk(clk_pcie), .Rst_n(rst_n_pcie),
+      
+      .in0(mux1__pcie), .in1(mux2__pcie), .in2(stats__clk2pcie),
+      .out(all_stats__pcie)
+      );
    
    
-stats_unpacker_avlstrm stats_unpacker 
-  (
-   .Clk(clk_pcie),
-   .stats_in(all_stats__pcie),
-
-   // combinational read from pci_status domain
-   .readaddr(status_addr_r),
-   .readdata(stats_readdata)  
-   );
+   stats_unpacker_avlstrm stats_unpacker 
+     (
+      .Clk(clk_pcie),
+      .stats_in(all_stats__pcie),
+      
+      // combinational read from pci_status domain
+      .readaddr(status_addr_r),
+      .readdata(stats_readdata)  
+      );
    
    
 always @(posedge clk_status) begin
@@ -724,58 +708,7 @@ always @(posedge clk_status) begin
             case (status_addr_r)
                 REG_IN_PKT                : status_readdata <= in_pkt_status;
                 REG_OUT_PKT               : status_readdata <= out_pkt_status;
-                //REG_INCOMP_OUT_META       : status_readdata <= incomp_out_meta_status;
-                //REG_PARSER_OUT_META       : status_readdata <= parser_out_meta_status;
-                //REG_FT_IN_META            : status_readdata <= ft_in_meta_status;
-                //REG_FT_OUT_META           : status_readdata <= ft_out_meta_status;
-                //REG_EMPTYLIST_IN          : status_readdata <= emptylist_in_status;
-                //REG_EMPTYLIST_OUT         : status_readdata <= emptylist_out_status;
-                //REG_DM_IN_META            : status_readdata <= dm_in_meta_status;
-                //REG_DM_OUT_META           : status_readdata <= dm_out_meta_status;
-                //REG_DM_IN_FORWARD_META    : status_readdata <= dm_in_forward_meta_status;
-                //REG_DM_IN_DROP_META       : status_readdata <= dm_in_drop_meta_status;
-                //REG_DM_IN_CHECK_META      : status_readdata <= dm_in_check_meta_status;
-                //REG_DM_IN_OOO_META        : status_readdata <= dm_in_ooo_meta_status;
-                //REG_DM_IN_FORWARD_OOO_META: status_readdata <= dm_in_forward_ooo_meta_status;
-                //REG_NOPAYLOAD_PKT         : status_readdata <= nopayload_pkt_status;
-                //REG_DM_CHECK_PKT          : status_readdata <= dm_check_pkt_status; 
-                //REG_SM_PKT                : status_readdata <= sm_pkt_status;
-                //REG_SM_META               : status_readdata <= sm_meta_status;
-                //REG_SM_RULE               : status_readdata <= sm_rule_status;
-                //REG_SM_CHECK_PKT          : status_readdata <= sm_check_pkt_status;
-                //REG_SM_CHECK_PKT_SOP      : status_readdata <= sm_check_pkt_s_status;
-                //REG_SM_NOCHECK_PKT        : status_readdata <= sm_nocheck_pkt_status;
-                //REG_PG_PKT                : status_readdata <= pg_pkt_status;
-                //REG_PG_META               : status_readdata <= pg_meta_status;
-                //REG_PG_RULE               : status_readdata <= pg_rule_status;
-                //REG_PG_CHECK_PKT          : status_readdata <= pg_check_pkt_status;
-                //REG_PG_CHECK_PKT_SOP      : status_readdata <= pg_check_pkt_s_status;
-                //REG_PG_NOCHECK_PKT        : status_readdata <= pg_nocheck_pkt_status;
-                //REG_BYPASS_PKT            : status_readdata <= bypass_pkt_status;
-                //REG_BYPASS_PKT_SOP        : status_readdata <= bypass_pkt_s_status;
-                //REG_BYPASS_META           : status_readdata <= bypass_meta_status;
-                //REG_BYPASS_RULE           : status_readdata <= bypass_rule_status;
-                //REG_NF_PKT                : status_readdata <= nf_pkt_status;
-                //REG_NF_RULE               : status_readdata <= nf_rule_status;
-                //REG_NF_META               : status_readdata <= nf_meta_status;
-                //REG_NF_CHECK_PKT          : status_readdata <= nf_check_pkt_status;
-                //REG_NF_CHECK_PKT_SOP      : status_readdata <= nf_check_pkt_s_status;
-                //REG_NF_NOCHECK_PKT        : status_readdata <= nf_nocheck_pkt_status;
-                //REG_MERGE_PKT             : status_readdata <= merge_pkt_status;
-                //REG_MERGE_PKT_SOP         : status_readdata <= merge_pkt_s_status;
-                //REG_MERGE_META            : status_readdata <= merge_meta_status;
-                //REG_MERGE_RULE            : status_readdata <= merge_rule_status;
-                //REG_DMA_PKT               : status_readdata <= dma_pkt_status;
-                //REG_CPU_NOMATCH_PKT       : status_readdata <= cpu_nomatch_pkt_status;
-                //REG_CPU_MATCH_PKT         : status_readdata <= cpu_match_pkt_status;
                 REG_CTRL                  : status_readdata <= ctrl_status;
-                //REG_MAX_DM2SM             : status_readdata <= max_dm2sm_status;
-                //REG_MAX_SM2PG             : status_readdata <= max_sm2pg_status;
-                //REG_MAX_PG2NF             : status_readdata <= max_pg2nf_status;
-                //REG_MAX_BYPASS2NF         : status_readdata <= max_bypass2nf_status;
-                //REG_MAX_NF2PDU            : status_readdata <= max_nf2pdu_status;
-                //REG_SM_BYPASS_AF          : status_readdata <= sm_bypass_af_status;
-                //REG_SM_CDC_AF             : status_readdata <= sm_cdc_af_status;
                 default                   : status_readdata <= stats_readdata;
             endcase
         end
@@ -875,22 +808,22 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .pkt_buffer_read(pkt_buf_rden),
         .pkt_buffer_readvalid(pkt_buf_rd_valid),
         .pkt_buffer_readdata(pkt_buf_rddata),
-        .parser_meta_csr_readdata(parser_meta_csr_readdata_r),
-        .stats_incomp_out_meta(stats_incomp_out_meta_r),
-        .stats_parser_out_meta(stats_parser_out_meta_r),
-        .stats_ft_in_meta(stats_ft_in_meta_r),
-        .stats_ft_out_meta(stats_ft_out_meta_r),
-        .stats_emptylist_in(stats_emptylist_in_r),
-        .stats_emptylist_out(stats_emptylist_out_r),
-        .stats_dm_in_meta(stats_dm_in_meta_r),
-        .stats_dm_out_meta(stats_dm_out_meta_r),
-        .stats_dm_in_forward_meta(stats_dm_in_forward_meta_r),
-        .stats_dm_in_drop_meta(stats_dm_in_drop_meta_r),
-        .stats_dm_in_check_meta(stats_dm_in_check_meta_r),
-        .stats_dm_in_ooo_meta(stats_dm_in_ooo_meta_r),
-        .stats_dm_in_forward_ooo_meta(stats_dm_in_forward_ooo_meta_r),
-        .stats_nopayload_pkt(stats_nopayload_pkt_r),
-        .stats_dm_check_pkt(stats_dm_check_pkt_r),
+//        .parser_meta_csr_readdata(parser_meta_csr_readdata_r),
+//        .stats_incomp_out_meta(stats_incomp_out_meta_r),
+//        .stats_parser_out_meta(stats_parser_out_meta_r),
+//        .stats_ft_in_meta(stats_ft_in_meta_r),
+//        .stats_ft_out_meta(stats_ft_out_meta_r),
+//        .stats_emptylist_in(stats_emptylist_in_r),
+//        .stats_emptylist_out(stats_emptylist_out_r),
+//        .stats_dm_in_meta(stats_dm_in_meta_r),
+//        .stats_dm_out_meta(stats_dm_out_meta_r),
+//        .stats_dm_in_forward_meta(stats_dm_in_forward_meta_r),
+//        .stats_dm_in_drop_meta(stats_dm_in_drop_meta_r),
+//        .stats_dm_in_check_meta(stats_dm_in_check_meta_r),
+//        .stats_dm_in_ooo_meta(stats_dm_in_ooo_meta_r),
+//        .stats_dm_in_forward_ooo_meta(stats_dm_in_forward_ooo_meta_r),
+//        .stats_nopayload_pkt(stats_nopayload_pkt_r),
+//        .stats_dm_check_pkt(stats_dm_check_pkt_r),
 	.stats_out(r_stats__clk),
         .eth(r_eth_direct),
         .nopayload(fifo0_in_direct),
@@ -944,11 +877,11 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
    channel_fifo_avlstrm#(.DUAL_CLOCK(0)) my_dm2sm (
         .Clk_i(clk),
         .Rst_n_i(rst_n),
-        .in_pkt_fill_level(in_pkt_fill_level_dm2sm),
-        .stats_in_pkt(stats_in_pkt_dm2sm),
-        .stats_in_pkt_sop(stats_in_pkt_sop_dm2sm),
-        .stats_in_meta(stats_in_meta_dm2sm),
-        .stats_in_rule(stats_in_rule_dm2sm),
+//        .in_pkt_fill_level(in_pkt_fill_level_dm2sm),
+//        .stats_in_pkt(stats_in_pkt_dm2sm),
+//        .stats_in_pkt_sop(stats_in_pkt_sop_dm2sm),
+//        .stats_in_meta(stats_in_meta_dm2sm),
+//        .stats_in_rule(stats_in_rule_dm2sm),
         .stats_out(dm2sm_stats__clk),						    
         .stats_in_pkt_max_fill_level_addr(REG_MAX_DM2SM),
         .stats_in_pkt_addr(REG_NOTUSED),
@@ -969,14 +902,14 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .Rst_front_n(rst_n),
         .Clk_back(clk_pcie),
         .Rst_back_n(rst_n_pcie),
-        .sm_bypass_af(sm_bypass_af_fpm),
-        .sm_cdc_af(sm_cdc_af_fpm),
-        .stats_out_pkt(stats_out_pkt_fpm),
-        .stats_out_meta(stats_out_meta_fpm),
-        .stats_out_rule(stats_out_rule_fpm),
-        .stats_nocheck_pkt(stats_nocheck_pkt_fpm),
-        .stats_check_pkt(stats_check_pkt_fpm),
-        .stats_check_pkt_sop(stats_check_pkt_s_fpm),
+//        .sm_bypass_af(sm_bypass_af_fpm),
+//        .sm_cdc_af(sm_cdc_af_fpm),
+//        .stats_out_pkt(stats_out_pkt_fpm),
+//        .stats_out_meta(stats_out_meta_fpm),
+//        .stats_out_rule(stats_out_rule_fpm),
+//        .stats_nocheck_pkt(stats_nocheck_pkt_fpm),
+//        .stats_check_pkt(stats_check_pkt_fpm),
+//        .stats_check_pkt_sop(stats_check_pkt_s_fpm),
         .stats_out(fpm_stats__clk),						    
         .stats_out_back(fpm_stats__pcie),						    
         .in_pkt(fpm_in_pkt_direct),
@@ -992,11 +925,11 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .Rst_n_i(rst_n_pcie),
         .Clk_o(clk_pcie),
         .Rst_n_o(rst_n_pcie),
-        .in_pkt_fill_level(in_pkt_fill_level_sm2pg),
-        .stats_in_pkt(stats_in_pkt_sm2pg),
-        .stats_in_pkt_sop(stats_in_pkt_sop_sm2pg),
-        .stats_in_meta(stats_in_meta_sm2pg),
-        .stats_in_rule(stats_in_rule_sm2pg),
+//        .in_pkt_fill_level(in_pkt_fill_level_sm2pg),
+//        .stats_in_pkt(stats_in_pkt_sm2pg),
+//        .stats_in_pkt_sop(stats_in_pkt_sop_sm2pg),
+//        .stats_in_meta(stats_in_meta_sm2pg),
+//        .stats_in_rule(stats_in_rule_sm2pg),
         .stats_out(sm2pg_stats__pcie),						    
         .stats_in_pkt_max_fill_level_addr(REG_MAX_SM2PG),
         .stats_in_pkt_addr(REG_NOTUSED),
@@ -1013,14 +946,14 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
     port_group_matcher_avlstrm my_pg (
         .Clk(clk_pcie),
         .Rst_n(rst_n_pcie),
-        .stats_out_pkt(stats_out_pkt_pg),
-        .stats_out_meta(stats_out_meta_pg),
-        .stats_out_rule(stats_out_rule_pg),
-        .stats_nocheck_pkt(stats_nocheck_pkt_pg),
-        .stats_check_pkt(stats_check_pkt_pg),
-        .stats_check_pkt_sop(stats_check_pkt_s_pg),
-        .stats_no_pg_rule_cnt(pg_no_pg_rule_cnt_pg),
-        .stats_pg_rule_cnt(pg_int_rule_cnt_pg),
+//        .stats_out_pkt(stats_out_pkt_pg),
+//        .stats_out_meta(stats_out_meta_pg),
+//        .stats_out_rule(stats_out_rule_pg),
+//        .stats_nocheck_pkt(stats_nocheck_pkt_pg),
+//        .stats_check_pkt(stats_check_pkt_pg),
+//        .stats_check_pkt_sop(stats_check_pkt_s_pg),
+//        .stats_no_pg_rule_cnt(pg_no_pg_rule_cnt_pg),
+//        .stats_pg_rule_cnt(pg_int_rule_cnt_pg),
         .stats_out(pg_stats__pcie),
         .in_pkt(pg_in_pkt_direct),
         .in_meta(pg_in_meta_direct),
@@ -1033,11 +966,11 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
     channel_fifo_avlstrm#(.DUAL_CLOCK(0)) my_pg2nf (
         .Clk_i(clk_pcie),
         .Rst_n_i(rst_n_pcie),
-        .in_pkt_fill_level(in_pkt_fill_level_pg2nf),
-        .stats_in_pkt(stats_in_pkt_pg2nf),
-        .stats_in_pkt_sop(stats_in_pkt_sop_pg2nf),
-        .stats_in_meta(stats_in_meta_pg2nf),
-        .stats_in_rule(stats_in_rule_pg2nf),
+//        .in_pkt_fill_level(in_pkt_fill_level_pg2nf),
+//        .stats_in_pkt(stats_in_pkt_pg2nf),
+//        .stats_in_pkt_sop(stats_in_pkt_sop_pg2nf),
+//        .stats_in_meta(stats_in_meta_pg2nf),
+//        .stats_in_rule(stats_in_rule_pg2nf),
         .stats_out(pg2nf_stats__pcie),						    
         .stats_in_pkt_max_fill_level_addr(REG_MAX_PG2NF),
         .stats_in_pkt_addr(REG_NOTUSED),
@@ -1056,22 +989,22 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .Rst_n(rst_n_pcie),
         .Clk_high(clk_high),
         .Rst_high_n(rst_n_high),
-        .stats_out_pkt(stats_out_pkt_nf),
-        .stats_out_meta(stats_out_meta_nf),
-        .stats_out_rule(stats_out_rule_nf),
-        .stats_nocheck_pkt(stats_nocheck_pkt_nf),
-        .stats_check_pkt(stats_check_pkt_nf),
-        .stats_check_pkt_sop(stats_check_pkt_s_nf),
-        .stats_bypass_pkt(stats_bypass_pkt_nf),
-        .stats_bypass_pkt_sop(stats_bypass_pkt_s_nf),
-        .stats_bypass_meta(stats_bypass_meta_nf),
-        .stats_bypass_rule(stats_bypass_rule_nf),
-        .bypass_fill_level(bypass_fill_level_nf),
-        .bypass2nf_fill_level(bypass2nf_fill_level_nf),
-        .nf2bypass_fill_level(nf2bypass_fill_level_nf),
-        .nf_max_raw_pkt_fifo(nf_max_raw_pkt_fifo_nf),
-        .nf_max_pkt_fifo(nf_max_pkt_fifo_nf),
-        .nf_max_rule_fifo(nf_max_rule_fifo_nf),
+//        .stats_out_pkt(stats_out_pkt_nf),
+//        .stats_out_meta(stats_out_meta_nf),
+//        .stats_out_rule(stats_out_rule_nf),
+//        .stats_nocheck_pkt(stats_nocheck_pkt_nf),
+//        .stats_check_pkt(stats_check_pkt_nf),
+//        .stats_check_pkt_sop(stats_check_pkt_s_nf),
+//        .stats_bypass_pkt(stats_bypass_pkt_nf),
+//        .stats_bypass_pkt_sop(stats_bypass_pkt_s_nf),
+//        .stats_bypass_meta(stats_bypass_meta_nf),
+//        .stats_bypass_rule(stats_bypass_rule_nf),
+//        .bypass_fill_level(bypass_fill_level_nf),
+//        .bypass2nf_fill_level(bypass2nf_fill_level_nf),
+//        .nf2bypass_fill_level(nf2bypass_fill_level_nf),
+//        .nf_max_raw_pkt_fifo(nf_max_raw_pkt_fifo_nf),
+//        .nf_max_pkt_fifo(nf_max_pkt_fifo_nf),
+//        .nf_max_rule_fifo(nf_max_rule_fifo_nf),
         .stats_out(nf_stats__pcie),
         .in_pkt(nf_in_pkt_direct),
         .in_meta(nf_in_meta_direct),
@@ -1084,11 +1017,11 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
     channel_fifo_avlstrm#(.DUAL_CLOCK(0)) my_by2pd (
         .Clk_i(clk_pcie),
         .Rst_n_i(rst_n_pcie),
-        .in_pkt_fill_level(in_pkt_fill_level_by2pd),
-        .stats_in_pkt(stats_in_pkt_by2pd),
-        .stats_in_pkt_sop(stats_in_pkt_sop_by2pd),
-        .stats_in_meta(stats_in_meta_by2pd),
-        .stats_in_rule(stats_in_rule_by2pd),
+//        .in_pkt_fill_level(in_pkt_fill_level_by2pd),
+//        .stats_in_pkt(stats_in_pkt_by2pd),
+//        .stats_in_pkt_sop(stats_in_pkt_sop_by2pd),
+//        .stats_in_meta(stats_in_meta_by2pd),
+//        .stats_in_rule(stats_in_rule_by2pd),
         .stats_out(by2pd_stats__pcie),						    
         .stats_in_pkt_max_fill_level_addr(REG_MAX_NF2PDU),
         .stats_in_pkt_addr(REG_MERGE_PKT),
@@ -1113,7 +1046,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .pcie_rb_update_valid(internal_rb_update_valid),
         .pcie_rb_update_size(pcie_rb_update_size),
         .disable_pcie(disable_pcie),
-        .pdumeta_cpu_data(pdumeta_cpu_data),
+	.pdumeta_cpu_data(pdumeta_cpu_data),
         .pdumeta_cpu_valid(pdumeta_cpu_valid),
         .pdumeta_cpu_ready(pdumeta_cpu_ready),
         .pdumeta_cpu_csr_readdata(pdumeta_cpu_csr_readdata),
