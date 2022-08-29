@@ -615,6 +615,7 @@ end
 
    logic [31:0] stats_readdata;
    
+   avl_stream_if#(.WIDTH($bits(stats_t))) eth_stats__clk();
    avl_stream_if#(.WIDTH($bits(stats_t))) r_stats__clk();
    avl_stream_if#(.WIDTH($bits(stats_t))) dm2sm_stats__clk();//
    avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats__clk();
@@ -626,6 +627,7 @@ end
    avl_stream_if#(.WIDTH($bits(stats_t))) by2pd_stats__pcie();//
    avl_stream_if#(.WIDTH($bits(stats_t))) dma_stats__pcie();//
    
+   avl_stream_if#(.WIDTH($bits(stats_t))) mux1__clk();
    avl_stream_if#(.WIDTH($bits(stats_t))) mux__clk();
    avl_stream_if#(.WIDTH($bits(stats_t))) mux11__pcie();
    avl_stream_if#(.WIDTH($bits(stats_t))) mux1__pcie();
@@ -633,10 +635,16 @@ end
    avl_stream_if#(.WIDTH($bits(stats_t))) stats__clk2pcie();
    avl_stream_if#(.WIDTH($bits(stats_t))) all_stats__pcie();
    
-   pkt_mux_avlstrm_3 r_dm2sm_fpm_mux
+   pkt_mux_avlstrm_3 r_eth_fpm_mux
      (
       .Clk(clk), .Rst_n(rst_n),
-      .in0(r_stats__clk), .in1(dm2sm_stats__clk), .in2(fpm_stats__clk),
+      .in0(r_stats__clk), .in1(eth_stats__clk), .in2(fpm_stats__clk),
+      .out(mux1__clk)
+      );
+   pkt_mux_avlstrm dm2sm_mux1_mux
+     (
+      .Clk(clk), .Rst_n(rst_n),
+      .in0(dm2sm_stats__clk), .in1(mux1__clk),
       .out(mux__clk)
       );
    
@@ -706,8 +714,8 @@ always @(posedge clk_status) begin
         if (status_addr_sel_r == TOP_REG) begin
             status_readdata_valid <= 1'b1;
             case (status_addr_r)
-                REG_IN_PKT                : status_readdata <= in_pkt_status;
-                REG_OUT_PKT               : status_readdata <= out_pkt_status;
+              //REG_IN_PKT                : status_readdata <= in_pkt_status;
+              // REG_OUT_PKT               : status_readdata <= out_pkt_status;
                 REG_CTRL                  : status_readdata <= ctrl_status;
                 default                   : status_readdata <= stats_readdata;
             endcase
@@ -780,6 +788,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
     ethernet_multi_out_avlstrm my_ethernet (
         .Clk(clk),
         .Rst_n(rst_n),
+	.stats_out(eth_stats__clk),	
         .out_data(out_data),
         .out_valid(out_valid),
         .out_ready(out_ready),
