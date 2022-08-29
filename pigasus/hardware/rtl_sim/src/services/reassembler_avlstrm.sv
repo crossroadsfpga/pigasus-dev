@@ -1,5 +1,6 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
+`include "./src/stats_reg.sv"
 
 module reassembler_avlstrm (
     input logic Clk, 
@@ -32,12 +33,92 @@ module reassembler_avlstrm (
     output logic [31:0]                 stats_nopayload_pkt,
     output logic [31:0]                 stats_dm_check_pkt,
 
+    avl_stream_if.tx stats_out,
+
     avl_stream_if.rx eth, 
     avl_stream_if.tx nopayload,
     avl_stream_if.tx out_pkt,
     avl_stream_if.tx out_usr,
     avl_stream_if.tx out_meta
 );
+
+   stats_t parser_meta_csr_readdata_s;
+   stats_t stats_incomp_out_meta_s;
+   stats_t stats_parser_out_meta_s;
+   stats_t stats_ft_in_meta_s;
+   stats_t stats_ft_out_meta_s;
+   stats_t stats_emptylist_in_s;
+   stats_t stats_emptylist_out_s;
+   stats_t stats_dm_in_meta_s;
+   stats_t stats_dm_out_meta_s;
+   stats_t stats_dm_in_forward_meta_s;
+   stats_t stats_dm_in_drop_meta_s;
+   stats_t stats_dm_in_check_meta_s;
+   stats_t stats_dm_in_ooo_meta_s;
+   stats_t stats_dm_in_forward_ooo_meta_s;
+   stats_t stats_nopayload_pkt_s;
+   stats_t stats_dm_check_pkt_s;
+
+   assign parser_meta_csr_readdata_s.addr = REG_NOTUSED;
+   assign stats_incomp_out_meta_s.addr = REG_INCOMP_OUT_META;
+   assign stats_parser_out_meta_s.addr = REG_PARSER_OUT_META;
+   assign stats_ft_in_meta_s.addr = REG_FT_IN_META;
+   assign stats_ft_out_meta_s.addr = REG_FT_OUT_META;
+   assign stats_emptylist_in_s.addr = REG_EMPTYLIST_IN;
+   assign stats_emptylist_out_s.addr = REG_EMPTYLIST_OUT;
+   assign stats_dm_in_meta_s.addr = REG_DM_IN_META;
+   assign stats_dm_out_meta_s.addr = REG_DM_OUT_META;
+   assign stats_dm_in_forward_meta_s.addr = REG_DM_IN_FORWARD_META;
+   assign stats_dm_in_drop_meta_s.addr = REG_DM_IN_DROP_META;
+   assign stats_dm_in_check_meta_s.addr = REG_DM_IN_CHECK_META;
+   assign stats_dm_in_ooo_meta_s.addr = REG_DM_IN_OOO_META;
+   assign stats_dm_in_forward_ooo_meta_s.addr = REG_DM_IN_FORWARD_OOO_META;
+   assign stats_nopayload_pkt_s.addr = REG_NOPAYLOAD_PKT;
+   assign stats_dm_check_pkt_s.addr = REG_DM_CHECK_PKT;
+
+   assign parser_meta_csr_readdata_s.val = parser_meta_csr_readdata;
+   assign stats_incomp_out_meta_s.val = stats_incomp_out_meta;
+   assign stats_parser_out_meta_s.val = stats_parser_out_meta;
+   assign stats_ft_in_meta_s.val = stats_ft_in_meta;
+   assign stats_ft_out_meta_s.val = stats_ft_out_meta;
+   assign stats_emptylist_in_s.val = stats_emptylist_in;
+   assign stats_emptylist_out_s.val = stats_emptylist_out;
+   assign stats_dm_in_meta_s.val = stats_dm_in_meta;
+   assign stats_dm_out_meta_s.val = stats_dm_out_meta;
+   assign stats_dm_in_forward_meta_s.val = stats_dm_in_forward_meta;
+   assign stats_dm_in_drop_meta_s.val = stats_dm_in_drop_meta;
+   assign stats_dm_in_check_meta_s.val = stats_dm_in_check_meta;
+   assign stats_dm_in_ooo_meta_s.val = stats_dm_in_ooo_meta;
+   assign stats_dm_in_forward_ooo_meta_s.val = stats_dm_in_forward_ooo_meta;
+   assign stats_nopayload_pkt_s.val = stats_nopayload_pkt;
+   assign stats_dm_check_pkt_s.val = stats_dm_check_pkt;
+   
+   stats_packer_avlstrm #(16) stats_pack 
+   (
+    .Clk(Clk), 
+    .Rst_n(Rst_n),
+    
+    .stats({
+	    parser_meta_csr_readdata_s,
+	    stats_incomp_out_meta_s,
+	    stats_parser_out_meta_s,
+	    stats_ft_in_meta_s,
+	    stats_ft_out_meta_s,
+	    stats_emptylist_in_s,
+	    stats_emptylist_out_s,
+	    stats_dm_in_meta_s,
+	    stats_dm_out_meta_s,
+	    stats_dm_in_forward_meta_s,
+	    stats_dm_in_drop_meta_s,
+	    stats_dm_in_check_meta_s,
+	    stats_dm_in_ooo_meta_s,
+	    stats_dm_in_forward_ooo_meta_s,
+	    stats_nopayload_pkt_s,
+	    stats_dm_check_pkt_s
+	    }),
+    
+    .stats_out(stats_out)
+   );
 
     avl_stream_if#(.WIDTH(512))               incomp_pkt();
     avl_stream_if#(.WIDTH($bits(metadata_t))) incomp_meta();

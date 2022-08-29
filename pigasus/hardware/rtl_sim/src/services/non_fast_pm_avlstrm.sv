@@ -86,7 +86,7 @@ module non_fast_pm_avlstrm (
    assign stats_bypass_meta_s.addr = REG_BYPASS_META;
    assign stats_bypass_rule_s.addr = REG_BYPASS_RULE;
    assign stats_bypass_max_fill_level_s.addr = REG_NOTUSED;
-   assign stats_bypass2nf_max_fill_level_s.addr = REG_NOTUSED;
+   assign stats_bypass2nf_max_fill_level_s.addr = REG_MAX_BYPASS2NF;
    assign stats_nf2bypass_max_fill_level_s.addr = REG_NOTUSED;
    assign stats_nf_max_raw_pkt_fifo_s.addr = REG_NOTUSED;
    assign stats_nf_max_pkt_fifo_s.addr = REG_NOTUSED;
