@@ -248,7 +248,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
     ethernet_multi_out_avlstrm my_ethernet (
         .Clk(clk),
         .Rst_n(rst_n),
-	.stats_out(eth_stats__clk),	
+
         .out_data(out_data),
         .out_valid(out_valid),
         .out_ready(out_ready),
@@ -265,7 +265,9 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .out2(ethernet_out2_direct),
         .out3(ethernet_out3_direct),
         .out4(ethernet_out4_direct),
-        .in(r_eth_direct)
+        .in(r_eth_direct),
+
+	.stats_out(eth_stats__clk)	
     );
     reassembler_avlstrm my_r (
         .Clk(clk),
@@ -277,12 +279,14 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .pkt_buffer_read(pkt_buf_rden),
         .pkt_buffer_readvalid(pkt_buf_rd_valid),
         .pkt_buffer_readdata(pkt_buf_rddata),
-	.stats_out(r_stats__clk),
+
         .eth(r_eth_direct),
         .nopayload(fifo0_in_direct),
         .out_pkt(dm2sm_in_pkt_direct),
         .out_meta(dm2sm_in_meta_direct),
-        .out_usr(dm2sm_in_usr_direct)
+        .out_usr(dm2sm_in_usr_direct),
+
+	.stats_out(r_stats__clk)
     );
     unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo0"), .MEM_TYPE("M20K"), .DUAL_CLOCK(0), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo0 (
         .Clk_i(clk),
@@ -330,18 +334,20 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
    channel_fifo_avlstrm#(.DUAL_CLOCK(0)) my_dm2sm (
         .Clk_i(clk),
         .Rst_n_i(rst_n),
-        .stats_out(dm2sm_stats__clk),						    
-        .stats_in_pkt_max_fill_level_addr(REG_MAX_DM2SM),
-        .stats_in_pkt_addr(REG_NOTUSED),
-        .stats_in_pkt_sop_addr(REG_NOTUSED),
-        .stats_in_meta_addr(REG_NOTUSED),
-        .stats_in_rule_addr(REG_NOTUSED),
+
         .in_pkt(dm2sm_in_pkt_direct),
         .in_meta(dm2sm_in_meta_direct),
         .in_usr(dm2sm_in_usr_direct),
         .out_pkt(fpm_in_pkt_direct),
         .out_meta(fpm_in_meta_direct),
-        .out_usr(fpm_in_usr_direct)
+        .out_usr(fpm_in_usr_direct),
+
+        .stats_out(dm2sm_stats__clk),						    
+        .stats_in_pkt_max_fill_level_addr(REG_MAX_DM2SM),
+        .stats_in_pkt_addr(REG_NOTUSED),
+        .stats_in_pkt_sop_addr(REG_NOTUSED),
+        .stats_in_meta_addr(REG_NOTUSED),
+        .stats_in_rule_addr(REG_NOTUSED)
     );
     fast_pm_avlstrm my_fpm (
         .Clk(clk),
@@ -350,91 +356,104 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .Rst_front_n(rst_n),
         .Clk_back(clk_pcie),
         .Rst_back_n(rst_n_pcie),
-        .stats_out(fpm_stats__clk),						    
-        .stats_out_back(fpm_stats__pcie),						    
+
         .in_pkt(fpm_in_pkt_direct),
         .in_meta(fpm_in_meta_direct),
         .in_usr(fpm_in_usr_direct),
         .fp_nocheck(fifo1_in_direct),
         .out_pkt(sm2pg_in_pkt_direct),
         .out_meta(sm2pg_in_meta_direct),
-        .out_usr(sm2pg_in_usr_direct)
+        .out_usr(sm2pg_in_usr_direct),
+
+        .stats_out(fpm_stats__clk),						    
+        .stats_out_back(fpm_stats__pcie)						    
     );
     channel_fifo_avlstrm#(.DUAL_CLOCK(1)) my_sm2pg (
         .Clk_i(clk_pcie),
         .Rst_n_i(rst_n_pcie),
         .Clk_o(clk_pcie),
         .Rst_n_o(rst_n_pcie),
-        .stats_out(sm2pg_stats__pcie),						    
-        .stats_in_pkt_max_fill_level_addr(REG_MAX_SM2PG),
-        .stats_in_pkt_addr(REG_NOTUSED),
-        .stats_in_pkt_sop_addr(REG_NOTUSED),
-        .stats_in_meta_addr(REG_NOTUSED),
-        .stats_in_rule_addr(REG_NOTUSED),
+
         .in_pkt(sm2pg_in_pkt_direct),
         .in_meta(sm2pg_in_meta_direct),
         .in_usr(sm2pg_in_usr_direct),
         .out_pkt(pg_in_pkt_direct),
         .out_meta(pg_in_meta_direct),
-        .out_usr(pg_in_usr_direct)
+        .out_usr(pg_in_usr_direct),
+
+        .stats_out(sm2pg_stats__pcie),						    
+        .stats_in_pkt_max_fill_level_addr(REG_MAX_SM2PG),
+        .stats_in_pkt_addr(REG_NOTUSED),
+        .stats_in_pkt_sop_addr(REG_NOTUSED),
+        .stats_in_meta_addr(REG_NOTUSED),
+        .stats_in_rule_addr(REG_NOTUSED)
     );
     port_group_matcher_avlstrm my_pg (
         .Clk(clk_pcie),
         .Rst_n(rst_n_pcie),
-        .stats_out(pg_stats__pcie),
+
         .in_pkt(pg_in_pkt_direct),
         .in_meta(pg_in_meta_direct),
         .in_usr(pg_in_usr_direct),
         .pg_nocheck(fifo2_in_direct),
         .out_pkt(pg2nf_in_pkt_direct),
         .out_meta(pg2nf_in_meta_direct),
-        .out_usr(pg2nf_in_usr_direct)
+        .out_usr(pg2nf_in_usr_direct),
+
+        .stats_out(pg_stats__pcie)
     );
     channel_fifo_avlstrm#(.DUAL_CLOCK(0)) my_pg2nf (
         .Clk_i(clk_pcie),
         .Rst_n_i(rst_n_pcie),
-        .stats_out(pg2nf_stats__pcie),						    
-        .stats_in_pkt_max_fill_level_addr(REG_MAX_PG2NF),
-        .stats_in_pkt_addr(REG_NOTUSED),
-        .stats_in_pkt_sop_addr(REG_NOTUSED),
-        .stats_in_meta_addr(REG_NOTUSED),
-        .stats_in_rule_addr(REG_NOTUSED),
+
         .in_pkt(pg2nf_in_pkt_direct),
         .in_meta(pg2nf_in_meta_direct),
         .in_usr(pg2nf_in_usr_direct),
         .out_pkt(nf_in_pkt_direct),
         .out_meta(nf_in_meta_direct),
-        .out_usr(nf_in_usr_direct)
+        .out_usr(nf_in_usr_direct),
+
+        .stats_out(pg2nf_stats__pcie),						    
+        .stats_in_pkt_max_fill_level_addr(REG_MAX_PG2NF),
+        .stats_in_pkt_addr(REG_NOTUSED),
+        .stats_in_pkt_sop_addr(REG_NOTUSED),
+        .stats_in_meta_addr(REG_NOTUSED),
+        .stats_in_rule_addr(REG_NOTUSED)
     );
     non_fast_pm_avlstrm my_nf (
         .Clk(clk_pcie),
         .Rst_n(rst_n_pcie),
         .Clk_high(clk_high),
         .Rst_high_n(rst_n_high),
-        .stats_out(nf_stats__pcie),
+
         .in_pkt(nf_in_pkt_direct),
         .in_meta(nf_in_meta_direct),
         .in_usr(nf_in_usr_direct),
         .nfp_nocheck(fifo3_in_direct),
         .out_pkt(by2pd_in_pkt_direct),
         .out_meta(by2pd_in_meta_direct),
-        .out_usr(by2pd_in_usr_direct)
+        .out_usr(by2pd_in_usr_direct),
+
+        .stats_out(nf_stats__pcie)
     );
     channel_fifo_avlstrm#(.DUAL_CLOCK(0)) my_by2pd (
         .Clk_i(clk_pcie),
         .Rst_n_i(rst_n_pcie),
+
+        .in_pkt(by2pd_in_pkt_direct),
+        .in_meta(by2pd_in_meta_direct),
+        .in_usr(by2pd_in_usr_direct),
+
+        .out_pkt(dma_in_pkt_direct),
+        .out_meta(dma_in_meta_direct),
+        .out_usr(dma_in_usr_direct),
+
         .stats_out(by2pd_stats__pcie),						    
         .stats_in_pkt_max_fill_level_addr(REG_MAX_NF2PDU),
         .stats_in_pkt_addr(REG_MERGE_PKT),
         .stats_in_pkt_sop_addr(REG_MERGE_PKT_SOP),
         .stats_in_meta_addr(REG_MERGE_META),
-        .stats_in_rule_addr(REG_MERGE_RULE),
-        .in_pkt(by2pd_in_pkt_direct),
-        .in_meta(by2pd_in_meta_direct),
-        .in_usr(by2pd_in_usr_direct),
-        .out_pkt(dma_in_pkt_direct),
-        .out_meta(dma_in_meta_direct),
-        .out_usr(dma_in_usr_direct)
+        .stats_in_rule_addr(REG_MERGE_RULE)
     );
     dma_avlstrm my_dma (
         .Clk(clk_pcie),
@@ -451,7 +470,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .pdumeta_cpu_valid(pdumeta_cpu_valid),
         .pdumeta_cpu_ready(pdumeta_cpu_ready),
         .pdumeta_cpu_csr_readdata(pdumeta_cpu_csr_readdata),
-	.stats_out(dma_stats__pcie),	
+
         .ddr_wr_req_data(ddr_wr_req_data),
         .ddr_wr_req_valid(ddr_wr_req_valid),
         .ddr_wr_req_almost_full(ddr_wr_req_almost_full),
@@ -461,10 +480,13 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .ddr_rd_resp_data(ddr_rd_resp_out_data),
         .ddr_rd_resp_valid(ddr_rd_resp_out_valid),
         .ddr_rd_resp_almost_full(ddr_rd_resp_out_ready),
+
         .in_pkt(dma_in_pkt_direct),
         .in_meta(dma_in_meta_direct),
         .in_usr(dma_in_usr_direct),
-        .nomatch_pkt(fifo4_in_direct)
+        .nomatch_pkt(fifo4_in_direct),
+			
+	.stats_out(dma_stats__pcie)	
     );
 endmodule: top
 

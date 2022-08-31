@@ -1,19 +1,20 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 
-module bypass_back_avlstrm (
-    input logic Clk, 
-    input logic Rst_n,
-
-    avl_stream_if.rx in_pkt,
-    avl_stream_if.rx in_meta,
-    avl_stream_if.rx in_usr,
-    avl_stream_if.rx bypass_pkt,
-    avl_stream_if.rx bypass_meta,
-    avl_stream_if.rx bypass_usr,
-    avl_stream_if.tx out_pkt,
-    avl_stream_if.tx out_meta,
-    avl_stream_if.tx out_usr
+module bypass_back_avlstrm 
+  (
+   input logic Clk, 
+   input logic Rst_n,
+   
+   avl_stream_if.rx in_pkt,
+   avl_stream_if.rx in_meta,
+   avl_stream_if.rx in_usr,
+   avl_stream_if.rx bypass_pkt,
+   avl_stream_if.rx bypass_meta,
+   avl_stream_if.rx bypass_usr,
+   avl_stream_if.tx out_pkt,
+   avl_stream_if.tx out_meta,
+   avl_stream_if.tx out_usr
 );
 
 bypass_nf_back bypass_nf_back_inst(

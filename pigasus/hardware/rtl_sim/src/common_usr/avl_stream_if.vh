@@ -14,7 +14,7 @@ interface avl_stream_if#(WIDTH=512,NUM=2) ();
     t_data      data;
     logic       valid;
     logic       ready;
-    logic       sop;
+    logic 	sop;
     logic       eop;
     t_empty     empty;
     logic       almost_full;
