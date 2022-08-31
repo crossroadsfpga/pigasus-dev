@@ -69,10 +69,12 @@ module top (
    // begin I/O channels section
    //
    avl_stream_if#(.WIDTH(PDU_META_WIDTH)) pdumeta_cpu();
+   assign pdumeta_cpu.almost_full=1; // not connected else where
    assign pdumeta_cpu.data=pdumeta_cpu_data;
    assign pdumeta_cpu.valid=pdumeta_cpu_valid;
 
    avl_stream_if#(.WIDTH(512)) eth_out();
+   assign eth_out.almost_full=1; // not connected else where
    assign out_data=eth_out.data;
    assign out_valid=eth_out.valid;
    assign eth_out.ready=out_ready;
@@ -81,6 +83,7 @@ module top (
    assign out_empty=eth_out.empty;
 
    avl_stream_if#(.WIDTH(512)) eth_in();
+   assign eth_in.almost_full=1; // not connected else where
    assign eth_in.sop=in_sop;
    assign eth_in.eop=in_eop;
    assign eth_in.data=in_data;
@@ -96,24 +99,42 @@ module top (
    logic [31:0] 	   stats_unpackdata;
    
    avl_stream_if#(.WIDTH($bits(stats_t))) eth_stats__clk();
+   assign eth_stats__clk.almost_full=1; // not connected else where
    avl_stream_if#(.WIDTH($bits(stats_t))) r_stats__clk();
-   avl_stream_if#(.WIDTH($bits(stats_t))) dm2sm_stats__clk();//
+   assign r_stats__clk.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH($bits(stats_t))) dm2sm_stats__clk();
+   assign dm2sm_stats__clk.almost_full=1; // not connected else where
    avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats__clk();
+   assign fpm_stats__clk.almost_full=1; // not connected else where
    avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats__pcie();
-   avl_stream_if#(.WIDTH($bits(stats_t))) sm2pg_stats__pcie();//
-   avl_stream_if#(.WIDTH($bits(stats_t))) pg_stats__pcie();//
-   avl_stream_if#(.WIDTH($bits(stats_t))) pg2nf_stats__pcie();//
-   avl_stream_if#(.WIDTH($bits(stats_t))) nf_stats__pcie();//
-   avl_stream_if#(.WIDTH($bits(stats_t))) by2pd_stats__pcie();//
-   avl_stream_if#(.WIDTH($bits(stats_t))) dma_stats__pcie();//
+   assign fpm_stats__pcie.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH($bits(stats_t))) sm2pg_stats__pcie();
+   assign sm2pg_stats__pcie.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH($bits(stats_t))) pg_stats__pcie();
+   assign pg_stats__pcie.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH($bits(stats_t))) pg2nf_stats__pcie();
+   assign pg2nf_stats__pcie.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH($bits(stats_t))) nf_stats__pcie();
+   assign nf_stats__pcie.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH($bits(stats_t))) by2pd_stats__pcie();
+   assign by2pd_stats__pcie.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH($bits(stats_t))) dma_stats__pcie();
+   assign dma_stats__pcie.almost_full=1; // not connected else where
+   
    
    avl_stream_if#(.WIDTH($bits(stats_t))) mux1__clk();
-   avl_stream_if#(.WIDTH($bits(stats_t))) mux__clk();
+   assign mux1__clk.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH($bits(stats_t))) mux__clk(); // uses almost full
    avl_stream_if#(.WIDTH($bits(stats_t))) mux11__pcie();
+   assign mux11__pcie.almost_full=1; // not connected else where
    avl_stream_if#(.WIDTH($bits(stats_t))) mux1__pcie();
+   assign mux1__pcie.almost_full=1; // not connected else where
    avl_stream_if#(.WIDTH($bits(stats_t))) mux2__pcie();
+   assign mux2__pcie.almost_full=1; // not connected else where
    avl_stream_if#(.WIDTH($bits(stats_t))) stats__clk2pcie();
+   assign stats__clk2pcie.almost_full=1; // not connected else where
    avl_stream_if#(.WIDTH($bits(stats_t))) all_stats__pcie();
+   assign all_stats__pcie.almost_full=1; // not connected else where
 
    // I think Intel has wider mux IPs
    pkt_mux_avlstrm_3 r_eth_fpm_mux
@@ -224,49 +245,71 @@ logic internal_rb_update_valid;
 assign pcie_rb_update_valid = disable_pcie ? 1'b0 : internal_rb_update_valid;
 
     avl_stream_if#(.WIDTH(512)) ethernet_out0_direct();
+   assign ethernet_out0_direct.almost_full=1; // not connected else where
     avl_stream_if#(.WIDTH(512)) ethernet_out1_direct();
+   assign ethernet_out1_direct.almost_full=1; // not connected else where
     avl_stream_if#(.WIDTH(512)) ethernet_out2_direct();
+   assign ethernet_out2_direct.almost_full=1; // not connected else where
     avl_stream_if#(.WIDTH(512)) ethernet_out3_direct();
+   assign ethernet_out3_direct.almost_full=1; // not connected else where
     avl_stream_if#(.WIDTH(512)) ethernet_out4_direct();
+   assign ethernet_out4_direct.almost_full=1; // not connected else where
+   
 
     avl_stream_if#(.WIDTH(512)) r_eth_direct();
+   assign r_eth_direct.almost_full=1; // not connected else where
+   
+    avl_stream_if#(.WIDTH(512)) fifo0_in_direct(); // uses almost full
+    avl_stream_if#(.WIDTH(512)) fifo3_in_direct(); // uses almost full
+    avl_stream_if#(.WIDTH(512)) fifo4_in_direct(); // uses almost full
+    avl_stream_if#(.WIDTH(512)) fifo1_in_direct(); // uses almost full
+    avl_stream_if#(.WIDTH(512)) fifo2_in_direct(); // uses almost full
 
-    avl_stream_if#(.WIDTH(512)) fifo0_in_direct();
-    avl_stream_if#(.WIDTH(512)) fifo3_in_direct();
-    avl_stream_if#(.WIDTH(512)) fifo4_in_direct();
-    avl_stream_if#(.WIDTH(512)) fifo1_in_direct();
-    avl_stream_if#(.WIDTH(512)) fifo2_in_direct();
-
-    avl_stream_if#(.WIDTH(512)) dm2sm_in_pkt_direct();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) dm2sm_in_meta_direct();
-    avl_stream_if#(.WIDTH(512)) dm2sm_in_usr_direct();
+    avl_stream_if#(.WIDTH(512)) dm2sm_in_pkt_direct(); // uses almost full
+    avl_stream_if#(.WIDTH($bits(metadata_t))) dm2sm_in_meta_direct(); // uses almost full
+    avl_stream_if#(.WIDTH(512)) dm2sm_in_usr_direct(); // uses almost full
 
     avl_stream_if#(.WIDTH(512)) fpm_in_pkt_direct();
+   assign fpm_in_pkt_direct.almost_full=1; // not connected else where
     avl_stream_if#(.WIDTH($bits(metadata_t))) fpm_in_meta_direct();
+   assign fpm_in_meta_direct.almost_full=1; // not connected else where
     avl_stream_if#(.WIDTH(512)) fpm_in_usr_direct();
-
-    avl_stream_if#(.WIDTH(512)) sm2pg_in_pkt_direct();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) sm2pg_in_meta_direct();
-    avl_stream_if#(.WIDTH(512)) sm2pg_in_usr_direct();
+   assign fpm_in_usr_direct.almost_full=1; // not connected else where
+   
+    avl_stream_if#(.WIDTH(512)) sm2pg_in_pkt_direct(); // uses almost full
+    avl_stream_if#(.WIDTH($bits(metadata_t))) sm2pg_in_meta_direct(); // uses almost full
+    avl_stream_if#(.WIDTH(512)) sm2pg_in_usr_direct(); // uses almost full
+   
 
     avl_stream_if#(.WIDTH(512)) pg_in_pkt_direct();
+   assign pg_in_pkt_direct.almost_full=1; // not connected else where
     avl_stream_if#(.WIDTH($bits(metadata_t))) pg_in_meta_direct();
+   assign pg_in_meta_direct.almost_full=1; // not connected else where
     avl_stream_if#(.WIDTH(512)) pg_in_usr_direct();
-    avl_stream_if#(.WIDTH(512)) pg2nf_in_pkt_direct();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) pg2nf_in_meta_direct();
-    avl_stream_if#(.WIDTH(512)) pg2nf_in_usr_direct();
+   assign pg_in_usr_direct.almost_full=1; // not connected else where
+   
+    avl_stream_if#(.WIDTH(512)) pg2nf_in_pkt_direct(); // uses almost full
+    avl_stream_if#(.WIDTH($bits(metadata_t))) pg2nf_in_meta_direct(); // uses almost full
+    avl_stream_if#(.WIDTH(512)) pg2nf_in_usr_direct(); // uses almost full
 
     avl_stream_if#(.WIDTH(512)) nf_in_pkt_direct();
+   assign nf_in_pkt_direct.almost_full=1; // not connected else where
     avl_stream_if#(.WIDTH($bits(metadata_t))) nf_in_meta_direct();
-    avl_stream_if#(.WIDTH(512)) nf_in_usr_direct();
-
-    avl_stream_if#(.WIDTH(512)) by2pd_in_pkt_direct();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) by2pd_in_meta_direct();
-    avl_stream_if#(.WIDTH(512)) by2pd_in_usr_direct();
-
+   assign nf_in_meta_direct.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH(512)) nf_in_usr_direct();
+   assign nf_in_usr_direct.almost_full=1; // not connected else where
+   
+    avl_stream_if#(.WIDTH(512)) by2pd_in_pkt_direct(); // uses almost full
+    avl_stream_if#(.WIDTH($bits(metadata_t))) by2pd_in_meta_direct(); // uses almost full
+    avl_stream_if#(.WIDTH(512)) by2pd_in_usr_direct(); // uses almost full
+   
     avl_stream_if#(.WIDTH(512)) dma_in_pkt_direct();
+   assign dma_in_pkt_direct.almost_full=1; // not connected else where
     avl_stream_if#(.WIDTH($bits(metadata_t))) dma_in_meta_direct();
+   assign dma_in_meta_direct.almost_full=1; // not connected else where
     avl_stream_if#(.WIDTH(512)) dma_in_usr_direct();
+   assign dma_in_usr_direct.almost_full=1; // not connected else where
+   
 
     ethernet_multi_out_avlstrm my_ethernet 
       (
