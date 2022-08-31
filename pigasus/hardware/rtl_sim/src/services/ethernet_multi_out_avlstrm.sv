@@ -8,23 +8,8 @@ module ethernet_multi_out_avlstrm
    input logic 	       Clk, 
    input logic 	       Rst_n,
 		       
-   output reg 	       out_valid,
-   input 	       out_ready,
-   output reg [511: 0] out_data,
-   output reg 	       out_sop,
-   output reg 	       out_eop,
-   output reg [5 : 0]  out_empty,
-   input 	       out_almostfull,
-
-   input logic 	       in_sop,
-   input logic 	       in_eop,
-   input logic [511:0] in_data,
-   input logic [5:0]   in_empty,
-   input logic 	       in_valid,
-   output logic        in_ready,
-
-   //avl_stream_if.rx in;
-   //avl_stream_if.rx out;
+   avl_stream_if.rx eth_in,
+   avl_stream_if.tx eth_out,
    
    avl_stream_if.tx in,
    avl_stream_if.rx out0,
@@ -45,14 +30,14 @@ always @ (posedge Clk) begin
         in_pkt <= 0;
         out_pkt <= 0;
     end else begin
-        if (in_eop & in_valid)begin
+        if (eth_in.eop & eth_in.valid)begin
             in_pkt <= in_pkt + 1'b1;
             //DEBUG 
             if (in_pkt[5:0] == 6'b00_0000) begin
                 $display("PKT %d", in_pkt);
             end
         end
-        if (out_eop & out_valid & out_ready)begin
+        if (eth_out.eop & eth_out.valid & eth_out.ready)begin
             out_pkt <= out_pkt + 1'b1;
         end
     end
@@ -80,23 +65,14 @@ end
     .stats_out(stats_out)
    );
 
-    avl_stream_if#(.WIDTH(512)) mux();
-    avl_stream_if#(.WIDTH(512)) out();
+   avl_stream_if#(.WIDTH(512)) mux();
     
-    assign out_valid = out.valid;
-    assign out_data = out.data;
-    assign out_sop = out.sop;
-    assign out_eop = out.eop;
-    assign out_empty = out.empty;
-    assign out.ready = out_ready;
-    assign out.almost_full = out_almostfull;
-    
-   assign in.empty=in_empty;
-   assign in.eop=in_eop;
-   assign in.sop=in_sop;
-   assign in.data = in_data; 
-   assign in.valid = in_valid; 
-   assign in_ready  = in.ready;
+   assign in.empty=eth_in.empty;
+   assign in.eop=eth_in.eop;
+   assign in.sop=eth_in.sop;
+   assign in.data = eth_in.data; 
+   assign in.valid = eth_in.valid; 
+   assign eth_in.ready  = in.ready;
     
     pkt_mux_avlstrm_3 mux_hi (
       .Clk(Clk), 
@@ -115,7 +91,7 @@ end
       .in0(mux),
       .in1(out3),
       .in2(out4),
-      .out(out)
+      .out(eth_out)
     );
 
 endmodule

@@ -177,9 +177,9 @@ bypass_front_avlstrm bypass_nf_front_inst(
 
 ////////////////////// Bypass channel //////////////////////////////////
 avl_stream_if#(.WIDTH($bits(stats_t)))stub[3]();
-assign stub[0].tx.ready=0;
-assign stub[1].tx.ready=0;
-assign stub[2].tx.ready=0;
+assign stub[0].ready=0;
+assign stub[1].ready=0;
+assign stub[2].ready=0;
    
 
 channel_fifo_avlstrm #(

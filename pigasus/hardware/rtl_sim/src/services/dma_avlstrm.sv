@@ -3,51 +3,56 @@
 `include "./src/stats_reg.sv"
 
 // top-level module
-module dma_avlstrm (
-    input logic Clk, 
-    input logic Rst_n,
-
-    // PCIe
-    output  flit_lite_t             pcie_rb_wr_data,
-    output  logic [PDU_AWIDTH-1:0]  pcie_rb_wr_addr,
-    output  logic                   pcie_rb_wr_en,
-    input   logic [PDU_AWIDTH-1:0]  pcie_rb_wr_base_addr,
-    input   logic                   pcie_rb_almost_full,
-    output  logic                   pcie_rb_update_valid,
-    output  logic [PDU_AWIDTH-1:0]  pcie_rb_update_size,
-    input   logic                   disable_pcie,
-    input   logic [PDU_META_WIDTH-1:0] pdumeta_cpu_data,        
-    input   logic                   pdumeta_cpu_valid,
-    output   logic                   pdumeta_cpu_ready,
-    output  logic [31:0]            pdumeta_cpu_csr_readdata,
-
-    // DRAM
-    output  ddr_wr_t                ddr_wr_req_data,
-    output  logic                   ddr_wr_req_valid,
-    input   logic                   ddr_wr_req_almost_full,
-    output  ddr_rd_t                ddr_rd_req_data,
-    output  logic                   ddr_rd_req_valid,
-    input   logic                   ddr_rd_req_almost_full,
-    input   logic [511:0]           ddr_rd_resp_data,
-    input   logic                   ddr_rd_resp_valid,
-    output  logic                   ddr_rd_resp_almost_full,
-
-    avl_stream_if.rx in_pkt,
-    avl_stream_if.rx in_meta,
-    avl_stream_if.rx in_usr,
-    avl_stream_if.tx nomatch_pkt,
-
-    // stats channel			    
-    avl_stream_if.tx stats_out
+module dma_avlstrm 
+  (
+   input logic 			    Clk, 
+   input logic 			    Rst_n,
+   
+   // PCIe
+   output 			    flit_lite_t pcie_rb_wr_data,
+   output logic [PDU_AWIDTH-1:0]    pcie_rb_wr_addr,
+   output logic 		    pcie_rb_wr_en,
+   input logic [PDU_AWIDTH-1:0]     pcie_rb_wr_base_addr,
+   input logic 			    pcie_rb_almost_full,
+   output logic 		    pcie_rb_update_valid,
+   output logic [PDU_AWIDTH-1:0]    pcie_rb_update_size,
+   input logic 			    disable_pcie,
+   
+   // DRAM
+   output 			    ddr_wr_t ddr_wr_req_data,
+   output logic 		    ddr_wr_req_valid,
+   input logic 			    ddr_wr_req_almost_full,
+   output 			    ddr_rd_t ddr_rd_req_data,
+   output logic 		    ddr_rd_req_valid,
+   input logic 			    ddr_rd_req_almost_full,
+   input logic [511:0] 		    ddr_rd_resp_data,
+   input logic 			    ddr_rd_resp_valid,
+   output logic 		    ddr_rd_resp_almost_full,
+				    
+   avl_stream_if.rx pdumeta_cpu,
+   avl_stream_if.rx in_pkt,
+   avl_stream_if.rx in_meta,
+   avl_stream_if.rx in_usr,
+   avl_stream_if.tx nomatch_pkt,
+   
+   // stats channel			    
+   avl_stream_if.tx stats_out
 );
 
    logic [31:0] 		    dma_pkt;
    logic [31:0] 		    cpu_nomatch_pkt;
    logic [31:0] 		    cpu_match_pkt;
 
-
    //PCIe clock domain
    pdu_metadata_t tmp_pdumeta_cpu_data;
+   logic [PDU_META_WIDTH-1:0] 	    pdumeta_cpu_data;
+   logic 			    pdumeta_cpu_valid;
+   logic 			    pdumeta_cpu_ready;
+
+   assign pdumeta_cpu_data = pdumeta_cpu.data;
+   assign pdumeta_cpu_valid = pdumeta_cpu.valid;
+   assign pdumeta_cpu.ready = pdumeta_cpu_ready;
+
    assign tmp_pdumeta_cpu_data = pdumeta_cpu_data;
    always @(posedge Clk) begin
       if (!Rst_n) begin
@@ -110,6 +115,8 @@ module dma_avlstrm (
    pdu_metadata_t pdumeta_cpu_fifo_data;
    logic 		   pdumeta_cpu_fifo_valid;
    logic 		   pdumeta_cpu_fifo_ready;
+   logic [31:0] 	   pdumeta_cpu_csr_readdata;
+   
    
    logic [511:0] 	   ddr_rd_resp_fifo_data;
    logic 		   ddr_rd_resp_fifo_valid;

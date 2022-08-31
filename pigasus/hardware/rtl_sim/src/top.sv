@@ -66,6 +66,32 @@ module top (
     assign rst_back = rst_pcie;
 
    //
+   // begin I/O channels section
+   //
+   avl_stream_if#(.WIDTH(PDU_META_WIDTH)) pdumeta_cpu();
+   assign pdumeta_cpu.data=pdumeta_cpu_data;
+   assign pdumeta_cpu.valid=pdumeta_cpu_valid;
+
+   avl_stream_if#(.WIDTH(512)) eth_out();
+   assign out_data=eth_out.data;
+   assign out_valid=eth_out.valid;
+   assign eth_out.ready=out_ready;
+   assign out_sop=eth_out.sop;
+   assign out_eop=eth_out.eop;
+   assign out_empty=eth_out.empty;
+
+   avl_stream_if#(.WIDTH(512)) eth_in();
+   assign eth_in.sop=in_sop;
+   assign eth_in.eop=in_eop;
+   assign eth_in.data=in_data;
+   assign eth_in.empty=in_empty;
+   assign eth_in.valid=in_valid;
+   
+   //
+   // end I/O channels section
+   //
+
+   //
    // begin stats section
    //
    logic [31:0] 	   stats_unpackdata;
@@ -195,10 +221,8 @@ module top (
    //
    
 logic internal_rb_update_valid;
-logic [31:0] pdumeta_cpu_csr_readdata;
 
 assign pcie_rb_update_valid = disable_pcie ? 1'b0 : internal_rb_update_valid;
-assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
 
     avl_stream_if#(.WIDTH(512)) ethernet_out0_direct();
     avl_stream_if#(.WIDTH(512)) ethernet_out1_direct();
@@ -245,30 +269,22 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
     avl_stream_if#(.WIDTH($bits(metadata_t))) dma_in_meta_direct();
     avl_stream_if#(.WIDTH(512)) dma_in_usr_direct();
 
-    ethernet_multi_out_avlstrm my_ethernet (
-        .Clk(clk),
-        .Rst_n(rst_n),
-
-        .out_data(out_data),
-        .out_valid(out_valid),
-        .out_ready(out_ready),
-        .out_sop(out_sop),
-        .out_eop(out_eop),
-        .out_empty(out_empty),
-        .in_sop(in_sop),
-        .in_eop(in_eop),
-        .in_data(in_data),
-        .in_empty(in_empty),
-        .in_valid(in_valid),
-        .out0(ethernet_out0_direct),
-        .out1(ethernet_out1_direct),
-        .out2(ethernet_out2_direct),
-        .out3(ethernet_out3_direct),
-        .out4(ethernet_out4_direct),
-        .in(r_eth_direct),
-
-	.stats_out(eth_stats__clk)	
-    );
+    ethernet_multi_out_avlstrm my_ethernet 
+      (
+       .Clk(clk),
+       .Rst_n(rst_n),
+       
+       .eth_out(eth_out),
+       .eth_in(eth_in),
+       .out0(ethernet_out0_direct),
+       .out1(ethernet_out1_direct),
+       .out2(ethernet_out2_direct),
+       .out3(ethernet_out3_direct),
+       .out4(ethernet_out4_direct),
+       .in(r_eth_direct),
+       
+       .stats_out(eth_stats__clk)	
+       );
     reassembler_avlstrm my_r (
         .Clk(clk),
         .Rst_n(rst_n),
@@ -461,10 +477,6 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .pcie_rb_update_valid(internal_rb_update_valid),
         .pcie_rb_update_size(pcie_rb_update_size),
         .disable_pcie(disable_pcie),
-	.pdumeta_cpu_data(pdumeta_cpu_data),
-        .pdumeta_cpu_valid(pdumeta_cpu_valid),
-        .pdumeta_cpu_ready(pdumeta_cpu_ready),
-        .pdumeta_cpu_csr_readdata(pdumeta_cpu_csr_readdata),
 
         .ddr_wr_req_data(ddr_wr_req_data),
         .ddr_wr_req_valid(ddr_wr_req_valid),
@@ -476,6 +488,7 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .ddr_rd_resp_valid(ddr_rd_resp_out_valid),
         .ddr_rd_resp_almost_full(ddr_rd_resp_out_ready),
 
+	.pdumeta_cpu(pdumeta_cpu),
         .in_pkt(dma_in_pkt_direct),
         .in_meta(dma_in_meta_direct),
         .in_usr(dma_in_usr_direct),
