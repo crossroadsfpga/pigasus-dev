@@ -1,6 +1,7 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 
+// top-level module
 module channel_fifo_avlstrm #(
     parameter DUAL_CLOCK = 0
    ) (

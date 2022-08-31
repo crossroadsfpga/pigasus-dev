@@ -1,6 +1,7 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 
+// submodule not used?
 module stream_demux_avlstrm (
     input logic Clk, 
     input logic Rst_n,

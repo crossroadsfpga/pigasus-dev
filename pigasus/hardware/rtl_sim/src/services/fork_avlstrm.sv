@@ -1,19 +1,21 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 
+// submodule multiple
 module fork_avlstrm (
     input logic Clk, 
     input logic Rst_n,
+
+    avl_stream_if.rx in,
+    avl_stream_if.tx out0,
+    avl_stream_if.tx out1,
+
     output logic [31:0]     stats_in_pkt,
     output logic [31:0]     stats_out_pkt0,
     output logic [31:0]     stats_out_pkt1,
     output logic [31:0]     stats_in_pkt_s,
     output logic [31:0]     stats_out_pkt0_s,
-    output logic [31:0]     stats_out_pkt1_s,
-
-    avl_stream_if.rx in,
-    avl_stream_if.tx out0,
-    avl_stream_if.tx out1
+    output logic [31:0]     stats_out_pkt1_s
 );
 
     fork_2 sm_fork (

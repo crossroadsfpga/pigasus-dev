@@ -1,12 +1,21 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 
+// submodule not used?
 module non_fast_pm_no_bypass_avlstrm (
     input logic Clk, 
     input logic Rst_n,
     input logic Clk_high, 
     input logic Rst_high_n,
     
+    avl_stream_if.rx in_pkt,
+    avl_stream_if.rx in_meta,
+    avl_stream_if.rx in_usr,
+    avl_stream_if.tx nfp_nocheck,
+    avl_stream_if.tx out_pkt,
+    avl_stream_if.tx out_meta,
+    avl_stream_if.tx out_usr,
+
     //stats
     output logic [31:0]     stats_out_pkt,
     output logic [31:0]     stats_out_meta,
@@ -23,15 +32,7 @@ module non_fast_pm_no_bypass_avlstrm (
     //output logic [31:0] nf2bypass_fill_level,
     output logic [31:0] nf_max_raw_pkt_fifo,
     output logic [31:0] nf_max_pkt_fifo,
-    output logic [31:0] nf_max_rule_fifo,
-
-    avl_stream_if.rx in_pkt,
-    avl_stream_if.rx in_meta,
-    avl_stream_if.rx in_usr,
-    avl_stream_if.tx nfp_nocheck,
-    avl_stream_if.tx out_pkt,
-    avl_stream_if.tx out_meta,
-    avl_stream_if.tx out_usr
+    output logic [31:0] nf_max_rule_fifo
 );
 
     //avl_stream_if#(.WIDTH(512))               nf_in_pkt_ifc();

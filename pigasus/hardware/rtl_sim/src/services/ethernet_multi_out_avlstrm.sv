@@ -2,6 +2,7 @@
 `include "./src/struct_s.sv"
 `include "./src/stats_reg.sv"
 
+// top-level module
 module ethernet_multi_out_avlstrm 
   (
    input logic 	       Clk, 
@@ -21,19 +22,22 @@ module ethernet_multi_out_avlstrm
    input logic [5:0]   in_empty,
    input logic 	       in_valid,
    output logic        in_ready,
-   
-   // stats channel			    
-   avl_stream_if.tx stats_out,
 
+   //avl_stream_if.rx in;
+   //avl_stream_if.rx out;
+   
    avl_stream_if.tx in,
    avl_stream_if.rx out0,
    avl_stream_if.rx out1,
    avl_stream_if.rx out2,
    avl_stream_if.rx out3,
-   avl_stream_if.rx out4
+   avl_stream_if.rx out4,
+
+   // stats channel			    
+   avl_stream_if.tx stats_out
 );
    logic [31:0]    in_pkt;
-logic [31:0]    out_pkt;
+   logic [31:0]    out_pkt;
 
 //System clock domain
 always @ (posedge Clk) begin

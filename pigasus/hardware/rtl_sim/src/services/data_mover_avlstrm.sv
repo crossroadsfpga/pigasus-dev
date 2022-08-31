@@ -1,6 +1,7 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 
+// ra submodule
 module data_mover_avlstrm (
     input logic Clk, 
     input logic Rst_n,

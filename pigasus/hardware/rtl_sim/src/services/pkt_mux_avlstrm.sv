@@ -1,6 +1,7 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 
+// submodule not used?
 module ethernet_mux_avlstrm (
     input logic Clk, 
     input logic Rst_n,
@@ -50,6 +51,7 @@ module ethernet_mux_avlstrm (
 
 endmodule
 
+// eth multi submodule
 module pkt_mux_avlstrm (
     input logic Clk, 
     input logic Rst_n,
@@ -85,6 +87,7 @@ st_multiplexer_pkt multiplexer_nf (
 
 endmodule
 
+// eth multi submodule
 module pkt_mux_avlstrm_3 (
     input logic Clk, 
     input logic Rst_n,

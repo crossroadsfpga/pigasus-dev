@@ -291,7 +291,6 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
     unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo0"), .MEM_TYPE("M20K"), .DUAL_CLOCK(0), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo0 (
         .Clk_i(clk),
         .Rst_n_i(rst_n),
-        .fill_level(dm_nopayload_pkt_csr_readdata),
         .in(fifo0_in_direct),
         .out(ethernet_out0_direct)
     );
@@ -300,7 +299,6 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .Rst_n_i(rst_n_pcie),
         .Clk_o(clk),
         .Rst_n_o(rst_n),
-        .fill_level(nf_nocheck_pkt_csr_readdata),
         .in(fifo3_in_direct),
         .out(ethernet_out1_direct)
     );
@@ -309,7 +307,6 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .Rst_n_i(rst_n_pcie),
         .Clk_o(clk),
         .Rst_n_o(rst_n),
-        .fill_level(nomatch_pkt_csr_readdata),
         .in(fifo4_in_direct),
         .out(ethernet_out2_direct)
     );
@@ -318,7 +315,6 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .Rst_n_i(rst_n_pcie),
         .Clk_o(clk),
         .Rst_n_o(rst_n),
-        .fill_level(sm_nocheck_pkt_csr_readdata),
         .in(fifo1_in_direct),
         .out(ethernet_out3_direct)
     );
@@ -327,7 +323,6 @@ assign pdumeta_cnt = pdumeta_cpu_csr_readdata[9:0];
         .Rst_n_i(rst_n_pcie),
         .Clk_o(clk),
         .Rst_n_o(rst_n),
-        .fill_level(pg_nocheck_pkt_csr_readdata),
         .in(fifo2_in_direct),
         .out(ethernet_out4_direct)
     );

@@ -1,6 +1,7 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 
+// top-level module
 module unified_pkt_fifo_avlstrm #(
     //new parameters
     parameter FIFO_NAME = "FIFO",
@@ -13,16 +14,17 @@ module unified_pkt_fifo_avlstrm #(
     parameter BITS_PER_SYMBOL     = 8,
     parameter FIFO_DEPTH          = 512
 ) (
-    input logic Clk_i, 
-    input logic Rst_n_i,
-    input logic Clk_o, 
-    input logic Rst_n_o,
+   input logic 	       Clk_i, 
+   input logic 	       Rst_n_i,
+   input logic 	       Clk_o, 
+   input logic 	       Rst_n_o,
+		       
+   avl_stream_if.rx in,
+   avl_stream_if.tx out,
 
-    output logic [31:0] fill_level,
-    output logic [31:0] overflow,
-
-    avl_stream_if.rx in,
-    avl_stream_if.tx out
+   // stats
+   output logic [31:0] fill_level,
+   output logic [31:0] overflow
 );
 
 unified_pkt_fifo  #(

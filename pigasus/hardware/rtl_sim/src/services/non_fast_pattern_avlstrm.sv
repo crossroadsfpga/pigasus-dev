@@ -1,6 +1,7 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 
+// nf and nf_no_bypass submodule
 module non_fast_pattern_avlstrm (
     input logic Clk, 
     input logic Rst_n,

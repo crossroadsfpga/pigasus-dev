@@ -1,23 +1,25 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 
-module port_group_avlstrm (
-    input logic Clk, 
-    input logic Rst_n,
-
-    //stats
-    output logic [31:0]     stats_out_pkt,
-    output logic [31:0]     stats_out_meta,
-    output logic [31:0]     stats_out_rule,
-    output  logic [31:0]    stats_no_pg_rule_cnt,
-    output  logic [31:0]    stats_pg_rule_cnt,
-
-    avl_stream_if.rx in_pkt,
-    avl_stream_if.rx in_meta,
-    avl_stream_if.rx in_usr,
-    avl_stream_if.tx out_pkt,
-    avl_stream_if.tx out_meta,
-    avl_stream_if.tx out_usr
+// pg submodule
+module port_group_avlstrm 
+  (
+   input logic 	       Clk, 
+   input logic 	       Rst_n,
+		       
+   avl_stream_if.rx in_pkt,
+   avl_stream_if.rx in_meta,
+   avl_stream_if.rx in_usr,
+   avl_stream_if.tx out_pkt,
+   avl_stream_if.tx out_meta,
+   avl_stream_if.tx out_usr,
+   
+   //stats
+   output logic [31:0] stats_out_pkt,
+   output logic [31:0] stats_out_meta,
+   output logic [31:0] stats_out_rule,
+   output logic [31:0] stats_no_pg_rule_cnt,
+   output logic [31:0] stats_pg_rule_cnt
 );
 
     port_group port_group_inst(

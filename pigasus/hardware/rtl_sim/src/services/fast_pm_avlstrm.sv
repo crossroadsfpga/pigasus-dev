@@ -2,6 +2,7 @@
 `include "./src/struct_s.sv"
 `include "./src/stats_reg.sv"
 
+// top-level module
 module fast_pm_avlstrm 
   (
     input logic 	Clk, 

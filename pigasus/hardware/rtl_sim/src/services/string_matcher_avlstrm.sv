@@ -1,6 +1,7 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 
+// sm submodule
 module string_matcher_avlstrm (
     input logic Clk, 
     input logic Rst_n,
@@ -9,19 +10,19 @@ module string_matcher_avlstrm (
     input logic Clk_back, 
     input logic Rst_back_n,
 
+    avl_stream_if.rx in_pkt,
+    avl_stream_if.rx in_meta,
+    avl_stream_if.tx out_pkt,
+    avl_stream_if.tx out_meta,
+    avl_stream_if.tx out_usr,
+
     //stats
     output logic [31:0]     stats_out_pkt,
     output logic [31:0]     stats_out_meta,
     output logic [31:0]     stats_out_rule,
 
     output logic [31:0]     sm_bypass_af,
-    output logic [31:0]     sm_cdc_af,
-
-    avl_stream_if.rx in_pkt,
-    avl_stream_if.rx in_meta,
-    avl_stream_if.tx out_pkt,
-    avl_stream_if.tx out_meta,
-    avl_stream_if.tx out_usr
+    output logic [31:0]     sm_cdc_af
 );
     string_matcher_wrapper sm_inst(
         .clk                    (Clk),

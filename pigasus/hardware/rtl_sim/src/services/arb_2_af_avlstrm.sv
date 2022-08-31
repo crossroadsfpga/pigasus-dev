@@ -1,6 +1,7 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 
+// ra submodule
 module arb_2_af_avlstrm#(
     parameter DWIDTH=8,
     parameter DEPTH=1024,

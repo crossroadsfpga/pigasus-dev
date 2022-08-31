@@ -1,18 +1,19 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 
+// ra submodule
 module flow_table_avlstrm (
     input logic Clk, 
     input logic Rst_n,
-    //stats
-    output logic [31:0] stats_in_meta,
-    output logic [31:0] stats_out_meta,
-
 
     avl_stream_if.rx in_meta,
     avl_stream_if.tx out_meta,
     avl_stream_if.tx forward_meta,
-    avl_stream_if.tx reorder_meta
+    avl_stream_if.tx reorder_meta,
+
+    //stats
+    output logic [31:0] stats_in_meta,
+    output logic [31:0] stats_out_meta
 );
 
     //Stats

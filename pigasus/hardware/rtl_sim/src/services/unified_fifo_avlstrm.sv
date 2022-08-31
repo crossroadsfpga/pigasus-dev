@@ -1,6 +1,7 @@
 `include "./src/common_usr/avl_stream_if.vh"
 `include "./src/struct_s.sv"
 
+// ra submodule
 module unified_fifo_avlstrm #(
     //new parameters
     parameter FIFO_NAME = "FIFO",
@@ -18,13 +19,13 @@ module unified_fifo_avlstrm #(
     input logic Clk_o, 
     input logic Rst_n_o,
 
+    avl_stream_if.rx in,
+    avl_stream_if.tx out,
+
     output logic [31:0] fill_level,
     output logic [31:0] overflow,
     output logic [31:0] stats_in,
-    output logic [31:0] stats_out,
-
-    avl_stream_if.rx in,
-    avl_stream_if.tx out
+    output logic [31:0] stats_out
 );
 
     unified_fifo  #(

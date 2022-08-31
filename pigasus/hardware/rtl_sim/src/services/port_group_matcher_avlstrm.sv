@@ -2,6 +2,7 @@
 `include "./src/struct_s.sv"
 `include "./src/stats_reg.sv"
 
+// top-level module
 module port_group_matcher_avlstrm  (
     input logic Clk, 
     input logic Rst_n,
