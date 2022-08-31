@@ -9,7 +9,18 @@ module non_fast_pm_avlstrm (
     input logic Clk_high, 
     input logic Rst_high_n,
     
-    //stats
+    avl_stream_if.rx in_pkt,
+    avl_stream_if.rx in_meta,
+    avl_stream_if.rx in_usr,
+    avl_stream_if.tx nfp_nocheck,
+    avl_stream_if.tx out_pkt,
+    avl_stream_if.tx out_meta,
+    avl_stream_if.tx out_usr,
+
+    // stats channel			    
+    avl_stream_if.tx stats_out,
+
+  //// below the line ///////////////////////////////////////////////////////
     output logic [31:0]     stats_out_pkt,
     output logic [31:0]     stats_out_meta,
     output logic [31:0]     stats_out_rule,
@@ -25,18 +36,7 @@ module non_fast_pm_avlstrm (
     output logic [31:0] nf2bypass_fill_level,
     output logic [31:0] nf_max_raw_pkt_fifo,
     output logic [31:0] nf_max_pkt_fifo,
-    output logic [31:0] nf_max_rule_fifo,
-
-    // stats channel			    
-    avl_stream_if.tx stats_out,
-			    
-    avl_stream_if.rx in_pkt,
-    avl_stream_if.rx in_meta,
-    avl_stream_if.rx in_usr,
-    avl_stream_if.tx nfp_nocheck,
-    avl_stream_if.tx out_pkt,
-    avl_stream_if.tx out_meta,
-    avl_stream_if.tx out_usr
+    output logic [31:0] nf_max_rule_fifo
 );
 
    reg [31:0] stats_bypass_max_fill_level_r;

@@ -22,7 +22,7 @@ module unified_pkt_fifo_avlstrm #(
    avl_stream_if.rx in,
    avl_stream_if.tx out,
 
-   // stats
+  //// below the line ///////////////////////////////////////////////////////
    output logic [31:0] fill_level,
    output logic [31:0] overflow
 );

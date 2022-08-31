@@ -7,6 +7,18 @@ module port_group_matcher_avlstrm  (
     input logic Clk, 
     input logic Rst_n,
 
+    avl_stream_if.rx in_pkt,
+    avl_stream_if.rx in_meta,
+    avl_stream_if.rx in_usr,
+    avl_stream_if.tx pg_nocheck,
+    avl_stream_if.tx out_pkt,
+    avl_stream_if.tx out_meta,
+    avl_stream_if.tx out_usr,
+
+    // stats channel			    
+    avl_stream_if.tx stats_out,
+
+  //// below the line ///////////////////////////////////////////////////////
     output logic [31:0]     stats_out_pkt,
     output logic [31:0]     stats_out_meta,
     output logic [31:0]     stats_out_rule,
@@ -15,18 +27,7 @@ module port_group_matcher_avlstrm  (
     output logic [31:0]     stats_check_pkt_sop,
     
     output  logic [31:0]    stats_no_pg_rule_cnt,
-    output  logic [31:0]    stats_pg_rule_cnt,
-
-    // stats channel			    
-    avl_stream_if.tx stats_out,
-
-    avl_stream_if.rx in_pkt,
-    avl_stream_if.rx in_meta,
-    avl_stream_if.rx in_usr,
-    avl_stream_if.tx pg_nocheck,
-    avl_stream_if.tx out_pkt,
-    avl_stream_if.tx out_meta,
-    avl_stream_if.tx out_usr
+    output  logic [31:0]    stats_pg_rule_cnt
 );
 
    stats_t stats_out_pkt_s;

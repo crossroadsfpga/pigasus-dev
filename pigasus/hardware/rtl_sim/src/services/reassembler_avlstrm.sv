@@ -26,6 +26,7 @@ module reassembler_avlstrm (
     // stats channel			    
     avl_stream_if.tx stats_out,
 
+   //// below the line ///////////////////////////////////////////////////////
     output logic [31:0]                 parser_meta_csr_readdata,
     output logic [31:0]                 stats_incomp_out_meta,
     output logic [31:0]                 stats_parser_out_meta,

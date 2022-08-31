@@ -86,7 +86,6 @@ module top (
    assign eth_in.data=in_data;
    assign eth_in.empty=in_empty;
    assign eth_in.valid=in_valid;
-   
    //
    // end I/O channels section
    //

@@ -20,6 +20,7 @@ module channel_fifo_avlstrm #(
     // stats channel			    
     avl_stream_if.tx stats_out,
 
+  //// below the line ///////////////////////////////////////////////////////
     output logic [31:0] stats_in_pkt,
     output logic [31:0] stats_in_pkt_sop,
     output logic [31:0] stats_in_meta,
