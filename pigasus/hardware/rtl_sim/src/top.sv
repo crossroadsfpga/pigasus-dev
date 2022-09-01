@@ -2,79 +2,78 @@
 `include "./src/struct_s.sv"
 `include "./src/stats_reg.sv"
 
-module top (
-    input logic [0:0] clk,
-    input logic [0:0] rst,
-    input logic [0:0] clk_high,
-    input logic [0:0] rst_high,
-    input logic [0:0] clk_pcie,
-    input logic [0:0] rst_pcie,
-    input logic [0:0] in_sop,
-    input logic [0:0] in_eop,
-    input logic [511:0] in_data,
-    input logic [5:0] in_empty,
-    input logic [0:0] in_valid,
-    output logic [511:0] out_data,
-    output logic [0:0] out_valid,
-    output logic [0:0] out_sop,
-    output logic [0:0] out_eop,
-    output logic [5:0] out_empty,
-    input logic [0:0] out_ready,
-    output logic [0:0] pkt_buf_wren,
-    output logic [PKTBUF_AWIDTH-1:0] pkt_buf_wraddress,
-    output logic [PKTBUF_AWIDTH-1:0] pkt_buf_rdaddress,
-    output logic [519:0] pkt_buf_wrdata,
-    output logic [0:0] pkt_buf_rden,
-    input logic [0:0] pkt_buf_rd_valid,
-    input logic [519:0] pkt_buf_rddata,
-    output logic [513:0] pcie_rb_wr_data,
-    output logic [11:0] pcie_rb_wr_addr,
-    output logic [0:0] pcie_rb_wr_en,
-    input logic [11:0] pcie_rb_wr_base_addr,
-    input logic [0:0] pcie_rb_almost_full,
-    output logic [0:0] pcie_rb_update_valid,
-    output logic [11:0] pcie_rb_update_size,
-    input logic [0:0] disable_pcie,
-    input logic [27:0] pdumeta_cpu_data,
-    input logic [0:0] pdumeta_cpu_valid,
-    output logic [9:0] pdumeta_cnt,
-    output logic [540:0] ddr_wr_req_data,
-    output logic [0:0] ddr_wr_req_valid,
-    input logic [0:0] ddr_wr_req_almost_full,
-    output logic [28:0] ddr_rd_req_data,
-    output logic [0:0] ddr_rd_req_valid,
-    input logic [0:0] ddr_rd_req_almost_full,
-    input logic [511:0] ddr_rd_resp_data,
-    input logic [0:0] ddr_rd_resp_valid,
-    output logic [0:0] ddr_rd_resp_almost_full,
-    input logic [0:0] clk_status,
-    input logic [29:0] status_addr,
-    input logic [0:0] status_read,
-    input logic [0:0] status_write,
-    input logic [31:0] status_writedata,
-    output logic [31:0] status_readdata,
-    output logic [0:0] status_readdata_valid
-);
-    // begin copy-paste
-    logic rst_n_high, rst_n, rst_n_pcie;
-    assign rst_n_high = ~rst_high;
-    assign rst_n = ~rst;
-    assign rst_n_pcie = ~rst_pcie;
+module top 
+  (
+   input logic [0:0] 		    clk,
+   input logic [0:0] 		    rst,
+   input logic [0:0] 		    clk_high,
+   input logic [0:0] 		    rst_high,
+   input logic [0:0] 		    clk_pcie,
+   input logic [0:0] 		    rst_pcie,
+   input logic [0:0] 		    in_sop,
+   input logic [0:0] 		    in_eop,
+   input logic [511:0] 		    in_data,
+   input logic [5:0] 		    in_empty,
+   input logic [0:0] 		    in_valid,
+   output logic [511:0] 	    out_data,
+   output logic [0:0] 		    out_valid,
+   output logic [0:0] 		    out_sop,
+   output logic [0:0] 		    out_eop,
+   output logic [5:0] 		    out_empty,
+   input logic [0:0] 		    out_ready,
+   output logic [0:0] 		    pkt_buf_wren,
+   output logic [PKTBUF_AWIDTH-1:0] pkt_buf_wraddress,
+   output logic [PKTBUF_AWIDTH-1:0] pkt_buf_rdaddress,
+   output logic [519:0] 	    pkt_buf_wrdata,
+   output logic [0:0] 		    pkt_buf_rden,
+   input logic [0:0] 		    pkt_buf_rd_valid,
+   input logic [519:0] 		    pkt_buf_rddata,
+   output logic [513:0] 	    pcie_rb_wr_data,
+   output logic [11:0] 		    pcie_rb_wr_addr,
+   output logic [0:0] 		    pcie_rb_wr_en,
+   input logic [11:0] 		    pcie_rb_wr_base_addr,
+   input logic [0:0] 		    pcie_rb_almost_full,
+   output logic [0:0] 		    pcie_rb_update_valid,
+   output logic [11:0] 		    pcie_rb_update_size,
+   input logic [0:0] 		    disable_pcie,
+   input logic [27:0] 		    pdumeta_cpu_data,
+   input logic [0:0] 		    pdumeta_cpu_valid,
+   output logic [9:0] 		    pdumeta_cnt,
+   output logic [540:0] 	    ddr_wr_req_data,
+   output logic [0:0] 		    ddr_wr_req_valid,
+   input logic [0:0] 		    ddr_wr_req_almost_full,
+   output logic [28:0] 		    ddr_rd_req_data,
+   output logic [0:0] 		    ddr_rd_req_valid,
+   input logic [0:0] 		    ddr_rd_req_almost_full,
+   input logic [511:0] 		    ddr_rd_resp_data,
+   input logic [0:0] 		    ddr_rd_resp_valid,
+   output logic [0:0] 		    ddr_rd_resp_almost_full,
+   input logic [0:0] 		    clk_status,
+   input logic [29:0] 		    status_addr,
+   input logic [0:0] 		    status_read,
+   input logic [0:0] 		    status_write,
+   input logic [31:0] 		    status_writedata,
+   output logic [31:0] 		    status_readdata,
+   output logic [0:0] 		    status_readdata_valid
+   );
+   // begin copy-paste
+   logic 			    rst_n_high, rst_n, rst_n_pcie;
+   assign rst_n_high = ~rst_high;
+   assign rst_n = ~rst;
+   assign rst_n_pcie = ~rst_pcie;
 
-    logic clk_back, rst_back;
-    assign clk_back = clk_pcie;
-    assign rst_back = rst_pcie;
+   logic 			    clk_back, rst_back;
+   assign clk_back = clk_pcie;
+   assign rst_back = rst_pcie;
 
    //
    // begin I/O channels section
    //
    avl_stream_if#(.WIDTH(PDU_META_WIDTH)) pdumeta_cpu();
-   assign pdumeta_cpu.almost_full=1; // not connected else where
    assign pdumeta_cpu.data=pdumeta_cpu_data;
    assign pdumeta_cpu.valid=pdumeta_cpu_valid;
 
    avl_stream_if#(.WIDTH(512)) eth_out();
-   assign eth_out.almost_full=1; // not connected else where
    assign out_data=eth_out.data;
    assign out_valid=eth_out.valid;
    assign eth_out.ready=out_ready;
@@ -83,7 +82,6 @@ module top (
    assign out_empty=eth_out.empty;
 
    avl_stream_if#(.WIDTH(512)) eth_in();
-   assign eth_in.almost_full=1; // not connected else where
    assign eth_in.sop=in_sop;
    assign eth_in.eop=in_eop;
    assign eth_in.data=in_data;
@@ -96,45 +94,27 @@ module top (
    //
    // begin stats section
    //
-   logic [31:0] 	   stats_unpackdata;
+   logic [31:0] 		    stats_unpackdata;
    
-   avl_stream_if#(.WIDTH($bits(stats_t))) eth_stats__clk();
-   assign eth_stats__clk.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) r_stats__clk();
-   assign r_stats__clk.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) dm2sm_stats__clk();
-   assign dm2sm_stats__clk.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats__clk();
-   assign fpm_stats__clk.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats__pcie();
-   assign fpm_stats__pcie.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) sm2pg_stats__pcie();
-   assign sm2pg_stats__pcie.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) pg_stats__pcie();
-   assign pg_stats__pcie.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) pg2nf_stats__pcie();
-   assign pg2nf_stats__pcie.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) nf_stats__pcie();
-   assign nf_stats__pcie.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) by2pd_stats__pcie();
-   assign by2pd_stats__pcie.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) dma_stats__pcie();
-   assign dma_stats__pcie.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH($bits(stats_t))) eth_stats__clk(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) r_stats__clk(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) dm2sm_stats__clk(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats__clk(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats__pcie(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) sm2pg_stats__pcie(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) pg_stats__pcie(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) pg2nf_stats__pcie(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) nf_stats__pcie(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) by2pd_stats__pcie(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) dma_stats__pcie(); // uses sop and eop
    
-   
-   avl_stream_if#(.WIDTH($bits(stats_t))) mux1__clk();
-   assign mux1__clk.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) mux__clk(); // uses almost full
-   avl_stream_if#(.WIDTH($bits(stats_t))) mux11__pcie();
-   assign mux11__pcie.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) mux1__pcie();
-   assign mux1__pcie.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) mux2__pcie();
-   assign mux2__pcie.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) stats__clk2pcie();
-   assign stats__clk2pcie.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH($bits(stats_t))) all_stats__pcie();
-   assign all_stats__pcie.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH($bits(stats_t))) mux1__clk(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) mux__clk(); // uses almost full // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) mux11__pcie(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) mux1__pcie(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) mux2__pcie(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) stats__clk2pcie(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(stats_t))) all_stats__pcie(); // uses sop and eop
 
    // I think Intel has wider mux IPs
    pkt_mux_avlstrm_3 r_eth_fpm_mux
@@ -185,12 +165,12 @@ module top (
       .out(all_stats__pcie)
       );
    
-   logic [31:0] 	   ctrl_status;
-   logic [7:0] status_addr_r;
-   logic [STAT_AWIDTH-1:0] status_addr_sel_r;
-   logic                   status_write_r;
-   logic                   status_read_r;
-   logic [31:0] 	   status_writedata_r;
+   logic [31:0] 		    ctrl_status;
+   logic [7:0] 			    status_addr_r;
+   logic [STAT_AWIDTH-1:0] 	    status_addr_sel_r;
+   logic 			    status_write_r;
+   logic 			    status_read_r;
+   logic [31:0] 		    status_writedata_r;
 
    stats_unpacker_avlstrm stats_unpacker 
      (
@@ -240,303 +220,297 @@ module top (
    // begin datapath section
    //
    
-logic internal_rb_update_valid;
+   logic internal_rb_update_valid;
 
-assign pcie_rb_update_valid = disable_pcie ? 1'b0 : internal_rb_update_valid;
+   assign pcie_rb_update_valid = disable_pcie ? 1'b0 : internal_rb_update_valid;
 
-    avl_stream_if#(.WIDTH(512)) ethernet_out0_direct();
-   assign ethernet_out0_direct.almost_full=1; // not connected else where
-    avl_stream_if#(.WIDTH(512)) ethernet_out1_direct();
-   assign ethernet_out1_direct.almost_full=1; // not connected else where
-    avl_stream_if#(.WIDTH(512)) ethernet_out2_direct();
-   assign ethernet_out2_direct.almost_full=1; // not connected else where
-    avl_stream_if#(.WIDTH(512)) ethernet_out3_direct();
-   assign ethernet_out3_direct.almost_full=1; // not connected else where
-    avl_stream_if#(.WIDTH(512)) ethernet_out4_direct();
-   assign ethernet_out4_direct.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH(512)) ethernet_out0_direct(); // uses sop and eop
+   avl_stream_if#(.WIDTH(512)) ethernet_out1_direct(); // uses sop and eop
+   avl_stream_if#(.WIDTH(512)) ethernet_out2_direct(); // uses sop and eop
+   avl_stream_if#(.WIDTH(512)) ethernet_out3_direct(); // uses sop and eop 
+   avl_stream_if#(.WIDTH(512)) ethernet_out4_direct(); // uses sop and eop
+
+   avl_stream_if#(.WIDTH(512)) r_eth_direct(); // uses sop and eop
    
+   avl_stream_if#(.WIDTH(512)) fifo0_in_direct(); // uses almost full // uses sop and eop
+   avl_stream_if#(.WIDTH(512)) fifo3_in_direct(); // uses almost full // uses sop and eop
+   avl_stream_if#(.WIDTH(512)) fifo4_in_direct(); // uses almost full // uses sop and eop
+   avl_stream_if#(.WIDTH(512)) fifo1_in_direct(); // uses almost full  // uses sop and eop
+   avl_stream_if#(.WIDTH(512)) fifo2_in_direct(); // uses almost full  // uses sop and eop
 
-    avl_stream_if#(.WIDTH(512)) r_eth_direct();
-   assign r_eth_direct.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH(512)) dm2sm_in_pkt_direct(); // uses almost full  // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(metadata_t))) dm2sm_in_meta_direct(); // uses almost full
+   avl_stream_if#(.WIDTH(512)) dm2sm_in_usr_direct(); // uses almost full // uses sop and eop
+
+   avl_stream_if#(.WIDTH(512)) fpm_in_pkt_direct();  // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(metadata_t))) fpm_in_meta_direct();
+   avl_stream_if#(.WIDTH(512)) fpm_in_usr_direct(); // uses sop and eop
    
-    avl_stream_if#(.WIDTH(512)) fifo0_in_direct(); // uses almost full
-    avl_stream_if#(.WIDTH(512)) fifo3_in_direct(); // uses almost full
-    avl_stream_if#(.WIDTH(512)) fifo4_in_direct(); // uses almost full
-    avl_stream_if#(.WIDTH(512)) fifo1_in_direct(); // uses almost full
-    avl_stream_if#(.WIDTH(512)) fifo2_in_direct(); // uses almost full
+   avl_stream_if#(.WIDTH(512)) sm2pg_in_pkt_direct(); // uses almost full  // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(metadata_t))) sm2pg_in_meta_direct(); // uses almost full
+   avl_stream_if#(.WIDTH(512)) sm2pg_in_usr_direct(); // uses almost full  // uses sop and eop
 
-    avl_stream_if#(.WIDTH(512)) dm2sm_in_pkt_direct(); // uses almost full
-    avl_stream_if#(.WIDTH($bits(metadata_t))) dm2sm_in_meta_direct(); // uses almost full
-    avl_stream_if#(.WIDTH(512)) dm2sm_in_usr_direct(); // uses almost full
-
-    avl_stream_if#(.WIDTH(512)) fpm_in_pkt_direct();
-   assign fpm_in_pkt_direct.almost_full=1; // not connected else where
-    avl_stream_if#(.WIDTH($bits(metadata_t))) fpm_in_meta_direct();
-   assign fpm_in_meta_direct.almost_full=1; // not connected else where
-    avl_stream_if#(.WIDTH(512)) fpm_in_usr_direct();
-   assign fpm_in_usr_direct.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH(512)) pg_in_pkt_direct();  // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(metadata_t))) pg_in_meta_direct();
+   avl_stream_if#(.WIDTH(512)) pg_in_usr_direct(); // uses sop and eop
    
-    avl_stream_if#(.WIDTH(512)) sm2pg_in_pkt_direct(); // uses almost full
-    avl_stream_if#(.WIDTH($bits(metadata_t))) sm2pg_in_meta_direct(); // uses almost full
-    avl_stream_if#(.WIDTH(512)) sm2pg_in_usr_direct(); // uses almost full
+   avl_stream_if#(.WIDTH(512)) pg2nf_in_pkt_direct(); // uses almost full  // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(metadata_t))) pg2nf_in_meta_direct(); // uses almost full
+   avl_stream_if#(.WIDTH(512)) pg2nf_in_usr_direct(); // uses almost full  // uses sop and eop
+
+   avl_stream_if#(.WIDTH(512)) nf_in_pkt_direct();  // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(metadata_t))) nf_in_meta_direct();
+   avl_stream_if#(.WIDTH(512)) nf_in_usr_direct(); // uses sop and eop
    
-
-    avl_stream_if#(.WIDTH(512)) pg_in_pkt_direct();
-   assign pg_in_pkt_direct.almost_full=1; // not connected else where
-    avl_stream_if#(.WIDTH($bits(metadata_t))) pg_in_meta_direct();
-   assign pg_in_meta_direct.almost_full=1; // not connected else where
-    avl_stream_if#(.WIDTH(512)) pg_in_usr_direct();
-   assign pg_in_usr_direct.almost_full=1; // not connected else where
+   avl_stream_if#(.WIDTH(512)) by2pd_in_pkt_direct(); // uses almost full  // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(metadata_t))) by2pd_in_meta_direct(); // uses almost full
+   avl_stream_if#(.WIDTH(512)) by2pd_in_usr_direct(); // uses almost full  // uses sop and eop
    
-    avl_stream_if#(.WIDTH(512)) pg2nf_in_pkt_direct(); // uses almost full
-    avl_stream_if#(.WIDTH($bits(metadata_t))) pg2nf_in_meta_direct(); // uses almost full
-    avl_stream_if#(.WIDTH(512)) pg2nf_in_usr_direct(); // uses almost full
+   avl_stream_if#(.WIDTH(512)) dma_in_pkt_direct(); // uses sop and eop
+   avl_stream_if#(.WIDTH($bits(metadata_t))) dma_in_meta_direct();
+   avl_stream_if#(.WIDTH(512)) dma_in_usr_direct(); // uses sop and eop
 
-    avl_stream_if#(.WIDTH(512)) nf_in_pkt_direct();
-   assign nf_in_pkt_direct.almost_full=1; // not connected else where
-    avl_stream_if#(.WIDTH($bits(metadata_t))) nf_in_meta_direct();
-   assign nf_in_meta_direct.almost_full=1; // not connected else where
-   avl_stream_if#(.WIDTH(512)) nf_in_usr_direct();
-   assign nf_in_usr_direct.almost_full=1; // not connected else where
-   
-    avl_stream_if#(.WIDTH(512)) by2pd_in_pkt_direct(); // uses almost full
-    avl_stream_if#(.WIDTH($bits(metadata_t))) by2pd_in_meta_direct(); // uses almost full
-    avl_stream_if#(.WIDTH(512)) by2pd_in_usr_direct(); // uses almost full
-   
-    avl_stream_if#(.WIDTH(512)) dma_in_pkt_direct();
-   assign dma_in_pkt_direct.almost_full=1; // not connected else where
-    avl_stream_if#(.WIDTH($bits(metadata_t))) dma_in_meta_direct();
-   assign dma_in_meta_direct.almost_full=1; // not connected else where
-    avl_stream_if#(.WIDTH(512)) dma_in_usr_direct();
-   assign dma_in_usr_direct.almost_full=1; // not connected else where
-   
+   ethernet_multi_out_avlstrm my_ethernet 
+     (
+      .Clk(clk),
+      .Rst_n(rst_n),
+      
+      .eth_out(eth_out),
+      .eth_in(eth_in),
+      .out0(ethernet_out0_direct),
+      .out1(ethernet_out1_direct),
+      .out2(ethernet_out2_direct),
+      .out3(ethernet_out3_direct),
+      .out4(ethernet_out4_direct),
+      .in(r_eth_direct),
+      
+      .stats_out(eth_stats__clk)	
+      );
+   reassembler_avlstrm my_r 
+     (
+      .Clk(clk),
+      .Rst_n(rst_n),
+      .pkt_buffer_writeaddress(pkt_buf_wraddress),
+      .pkt_buffer_write(pkt_buf_wren),
+      .pkt_buffer_writedata(pkt_buf_wrdata),
+      .pkt_buffer_readaddress(pkt_buf_rdaddress),
+      .pkt_buffer_read(pkt_buf_rden),
+      .pkt_buffer_readvalid(pkt_buf_rd_valid),
+      .pkt_buffer_readdata(pkt_buf_rddata),
 
-    ethernet_multi_out_avlstrm my_ethernet 
-      (
-       .Clk(clk),
-       .Rst_n(rst_n),
-       
-       .eth_out(eth_out),
-       .eth_in(eth_in),
-       .out0(ethernet_out0_direct),
-       .out1(ethernet_out1_direct),
-       .out2(ethernet_out2_direct),
-       .out3(ethernet_out3_direct),
-       .out4(ethernet_out4_direct),
-       .in(r_eth_direct),
-       
-       .stats_out(eth_stats__clk)	
-       );
-    reassembler_avlstrm my_r (
-        .Clk(clk),
-        .Rst_n(rst_n),
-        .pkt_buffer_writeaddress(pkt_buf_wraddress),
-        .pkt_buffer_write(pkt_buf_wren),
-        .pkt_buffer_writedata(pkt_buf_wrdata),
-        .pkt_buffer_readaddress(pkt_buf_rdaddress),
-        .pkt_buffer_read(pkt_buf_rden),
-        .pkt_buffer_readvalid(pkt_buf_rd_valid),
-        .pkt_buffer_readdata(pkt_buf_rddata),
+      .eth(r_eth_direct),
+      .nopayload(fifo0_in_direct),
+      .out_pkt(dm2sm_in_pkt_direct),
+      .out_meta(dm2sm_in_meta_direct),
+      .out_usr(dm2sm_in_usr_direct),
 
-        .eth(r_eth_direct),
-        .nopayload(fifo0_in_direct),
-        .out_pkt(dm2sm_in_pkt_direct),
-        .out_meta(dm2sm_in_meta_direct),
-        .out_usr(dm2sm_in_usr_direct),
+      .stats_out(r_stats__clk)
+      );
+   unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo0"), .MEM_TYPE("M20K"), .DUAL_CLOCK(0), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo0 
+     (
+      .Clk_i(clk),
+      .Rst_n_i(rst_n),
+      .in(fifo0_in_direct),
+      .out(ethernet_out0_direct)
+      );
+   unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo3"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo3 
+     (
+      .Clk_i(clk_pcie),
+      .Rst_n_i(rst_n_pcie),
+      .Clk_o(clk),
+      .Rst_n_o(rst_n),
+      .in(fifo3_in_direct),
+      .out(ethernet_out1_direct)
+      );
+   unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo4"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo4 
+     (
+      .Clk_i(clk_pcie),
+      .Rst_n_i(rst_n_pcie),
+      .Clk_o(clk),
+      .Rst_n_o(rst_n),
+      .in(fifo4_in_direct),
+      .out(ethernet_out2_direct)
+      );
+   unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo1"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo1 
+     (
+      .Clk_i(clk_pcie),
+      .Rst_n_i(rst_n_pcie),
+      .Clk_o(clk),
+      .Rst_n_o(rst_n),
+      .in(fifo1_in_direct),
+      .out(ethernet_out3_direct)
+      );
+   unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo2"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo2 
 
-	.stats_out(r_stats__clk)
-    );
-    unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo0"), .MEM_TYPE("M20K"), .DUAL_CLOCK(0), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo0 (
-        .Clk_i(clk),
-        .Rst_n_i(rst_n),
-        .in(fifo0_in_direct),
-        .out(ethernet_out0_direct)
-    );
-    unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo3"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo3 (
-        .Clk_i(clk_pcie),
-        .Rst_n_i(rst_n_pcie),
-        .Clk_o(clk),
-        .Rst_n_o(rst_n),
-        .in(fifo3_in_direct),
-        .out(ethernet_out1_direct)
-    );
-    unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo4"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo4 (
-        .Clk_i(clk_pcie),
-        .Rst_n_i(rst_n_pcie),
-        .Clk_o(clk),
-        .Rst_n_o(rst_n),
-        .in(fifo4_in_direct),
-        .out(ethernet_out2_direct)
-    );
-    unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo1"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo1 (
-        .Clk_i(clk_pcie),
-        .Rst_n_i(rst_n_pcie),
-        .Clk_o(clk),
-        .Rst_n_o(rst_n),
-        .in(fifo1_in_direct),
-        .out(ethernet_out3_direct)
-    );
-    unified_pkt_fifo_avlstrm#(.FIFO_NAME("[top] fifo2"), .MEM_TYPE("M20K"), .DUAL_CLOCK(1), .USE_ALMOST_FULL(1), .FULL_LEVEL(450), .SYMBOLS_PER_BEAT(64), .BITS_PER_SYMBOL(8), .FIFO_DEPTH(512)) my_fifo2 (
-        .Clk_i(clk_pcie),
-        .Rst_n_i(rst_n_pcie),
-        .Clk_o(clk),
-        .Rst_n_o(rst_n),
-        .in(fifo2_in_direct),
-        .out(ethernet_out4_direct)
-    );
-   channel_fifo_avlstrm#(.DUAL_CLOCK(0)) my_dm2sm (
-        .Clk_i(clk),
-        .Rst_n_i(rst_n),
+     (
+      .Clk_i(clk_pcie),
+      .Rst_n_i(rst_n_pcie),
+      .Clk_o(clk),
+      .Rst_n_o(rst_n),
+      .in(fifo2_in_direct),
+      .out(ethernet_out4_direct)
+      );
+   channel_fifo_avlstrm#(.DUAL_CLOCK(0)) my_dm2sm
+     (
+      .Clk_i(clk),
+      .Rst_n_i(rst_n),
 
-        .in_pkt(dm2sm_in_pkt_direct),
-        .in_meta(dm2sm_in_meta_direct),
-        .in_usr(dm2sm_in_usr_direct),
-        .out_pkt(fpm_in_pkt_direct),
-        .out_meta(fpm_in_meta_direct),
-        .out_usr(fpm_in_usr_direct),
+      .in_pkt(dm2sm_in_pkt_direct),
+      .in_meta(dm2sm_in_meta_direct),
+      .in_usr(dm2sm_in_usr_direct),
+      .out_pkt(fpm_in_pkt_direct),
+      .out_meta(fpm_in_meta_direct),
+      .out_usr(fpm_in_usr_direct),
 
-        .stats_out(dm2sm_stats__clk),						    
-        .stats_in_pkt_max_fill_level_addr(REG_MAX_DM2SM),
-        .stats_in_pkt_addr(REG_NOTUSED),
-        .stats_in_pkt_sop_addr(REG_NOTUSED),
-        .stats_in_meta_addr(REG_NOTUSED),
-        .stats_in_rule_addr(REG_NOTUSED)
-    );
-    fast_pm_avlstrm my_fpm (
-        .Clk(clk),
-        .Rst_n(rst_n),
-        .Clk_front(clk_high),
-        .Rst_front_n(rst_n),
-        .Clk_back(clk_pcie),
-        .Rst_back_n(rst_n_pcie),
+      .stats_out(dm2sm_stats__clk),						    
+      .stats_in_pkt_max_fill_level_addr(REG_MAX_DM2SM),
+      .stats_in_pkt_addr(REG_NOTUSED),
+      .stats_in_pkt_sop_addr(REG_NOTUSED),
+      .stats_in_meta_addr(REG_NOTUSED),
+      .stats_in_rule_addr(REG_NOTUSED)
+      );
+   fast_pm_avlstrm my_fpm
+     (
+      .Clk(clk),
+      .Rst_n(rst_n),
+      .Clk_front(clk_high),
+      .Rst_front_n(rst_n),
+      .Clk_back(clk_pcie),
+      .Rst_back_n(rst_n_pcie),
 
-        .in_pkt(fpm_in_pkt_direct),
-        .in_meta(fpm_in_meta_direct),
-        .in_usr(fpm_in_usr_direct),
-        .fp_nocheck(fifo1_in_direct),
-        .out_pkt(sm2pg_in_pkt_direct),
-        .out_meta(sm2pg_in_meta_direct),
-        .out_usr(sm2pg_in_usr_direct),
+      .in_pkt(fpm_in_pkt_direct),
+      .in_meta(fpm_in_meta_direct),
+      .in_usr(fpm_in_usr_direct),
+      .fp_nocheck(fifo1_in_direct),
+      .out_pkt(sm2pg_in_pkt_direct),
+      .out_meta(sm2pg_in_meta_direct),
+      .out_usr(sm2pg_in_usr_direct),
 
-        .stats_out(fpm_stats__clk),						    
-        .stats_out_back(fpm_stats__pcie)						    
-    );
-    channel_fifo_avlstrm#(.DUAL_CLOCK(1)) my_sm2pg (
-        .Clk_i(clk_pcie),
-        .Rst_n_i(rst_n_pcie),
-        .Clk_o(clk_pcie),
-        .Rst_n_o(rst_n_pcie),
+      .stats_out(fpm_stats__clk),						    
+      .stats_out_back(fpm_stats__pcie)						    
+      );
+   channel_fifo_avlstrm#(.DUAL_CLOCK(1)) my_sm2pg
+     (
+      .Clk_i(clk_pcie),
+      .Rst_n_i(rst_n_pcie),
+      .Clk_o(clk_pcie),
+      .Rst_n_o(rst_n_pcie),
 
-        .in_pkt(sm2pg_in_pkt_direct),
-        .in_meta(sm2pg_in_meta_direct),
-        .in_usr(sm2pg_in_usr_direct),
-        .out_pkt(pg_in_pkt_direct),
-        .out_meta(pg_in_meta_direct),
-        .out_usr(pg_in_usr_direct),
+      .in_pkt(sm2pg_in_pkt_direct),
+      .in_meta(sm2pg_in_meta_direct),
+      .in_usr(sm2pg_in_usr_direct),
+      .out_pkt(pg_in_pkt_direct),
+      .out_meta(pg_in_meta_direct),
+      .out_usr(pg_in_usr_direct),
 
-        .stats_out(sm2pg_stats__pcie),						    
-        .stats_in_pkt_max_fill_level_addr(REG_MAX_SM2PG),
-        .stats_in_pkt_addr(REG_NOTUSED),
-        .stats_in_pkt_sop_addr(REG_NOTUSED),
-        .stats_in_meta_addr(REG_NOTUSED),
-        .stats_in_rule_addr(REG_NOTUSED)
-    );
-    port_group_matcher_avlstrm my_pg (
-        .Clk(clk_pcie),
-        .Rst_n(rst_n_pcie),
+      .stats_out(sm2pg_stats__pcie),						    
+      .stats_in_pkt_max_fill_level_addr(REG_MAX_SM2PG),
+      .stats_in_pkt_addr(REG_NOTUSED),
+      .stats_in_pkt_sop_addr(REG_NOTUSED),
+      .stats_in_meta_addr(REG_NOTUSED),
+      .stats_in_rule_addr(REG_NOTUSED)
+      );
+   port_group_matcher_avlstrm my_pg
+     (
+      .Clk(clk_pcie),
+      .Rst_n(rst_n_pcie),
 
-        .in_pkt(pg_in_pkt_direct),
-        .in_meta(pg_in_meta_direct),
-        .in_usr(pg_in_usr_direct),
-        .pg_nocheck(fifo2_in_direct),
-        .out_pkt(pg2nf_in_pkt_direct),
-        .out_meta(pg2nf_in_meta_direct),
-        .out_usr(pg2nf_in_usr_direct),
+      .in_pkt(pg_in_pkt_direct),
+      .in_meta(pg_in_meta_direct),
+      .in_usr(pg_in_usr_direct),
+      .pg_nocheck(fifo2_in_direct),
+      .out_pkt(pg2nf_in_pkt_direct),
+      .out_meta(pg2nf_in_meta_direct),
+      .out_usr(pg2nf_in_usr_direct),
 
-        .stats_out(pg_stats__pcie)
-    );
-    channel_fifo_avlstrm#(.DUAL_CLOCK(0)) my_pg2nf (
-        .Clk_i(clk_pcie),
-        .Rst_n_i(rst_n_pcie),
+      .stats_out(pg_stats__pcie)
+      );
+   channel_fifo_avlstrm#(.DUAL_CLOCK(0)) my_pg2nf
+     (
+      .Clk_i(clk_pcie),
+      .Rst_n_i(rst_n_pcie),
 
-        .in_pkt(pg2nf_in_pkt_direct),
-        .in_meta(pg2nf_in_meta_direct),
-        .in_usr(pg2nf_in_usr_direct),
-        .out_pkt(nf_in_pkt_direct),
-        .out_meta(nf_in_meta_direct),
-        .out_usr(nf_in_usr_direct),
+      .in_pkt(pg2nf_in_pkt_direct),
+      .in_meta(pg2nf_in_meta_direct),
+      .in_usr(pg2nf_in_usr_direct),
+      .out_pkt(nf_in_pkt_direct),
+      .out_meta(nf_in_meta_direct),
+      .out_usr(nf_in_usr_direct),
 
-        .stats_out(pg2nf_stats__pcie),						    
-        .stats_in_pkt_max_fill_level_addr(REG_MAX_PG2NF),
-        .stats_in_pkt_addr(REG_NOTUSED),
-        .stats_in_pkt_sop_addr(REG_NOTUSED),
-        .stats_in_meta_addr(REG_NOTUSED),
-        .stats_in_rule_addr(REG_NOTUSED)
-    );
-    non_fast_pm_avlstrm my_nf (
-        .Clk(clk_pcie),
-        .Rst_n(rst_n_pcie),
-        .Clk_high(clk_high),
-        .Rst_high_n(rst_n_high),
+      .stats_out(pg2nf_stats__pcie),						    
+      .stats_in_pkt_max_fill_level_addr(REG_MAX_PG2NF),
+      .stats_in_pkt_addr(REG_NOTUSED),
+      .stats_in_pkt_sop_addr(REG_NOTUSED),
+      .stats_in_meta_addr(REG_NOTUSED),
+      .stats_in_rule_addr(REG_NOTUSED)
+      );
+   non_fast_pm_avlstrm my_nf
+     (
+      .Clk(clk_pcie),
+      .Rst_n(rst_n_pcie),
+      .Clk_high(clk_high),
+      .Rst_high_n(rst_n_high),
 
-        .in_pkt(nf_in_pkt_direct),
-        .in_meta(nf_in_meta_direct),
-        .in_usr(nf_in_usr_direct),
-        .nfp_nocheck(fifo3_in_direct),
-        .out_pkt(by2pd_in_pkt_direct),
-        .out_meta(by2pd_in_meta_direct),
-        .out_usr(by2pd_in_usr_direct),
+      .in_pkt(nf_in_pkt_direct),
+      .in_meta(nf_in_meta_direct),
+      .in_usr(nf_in_usr_direct),
+      .nfp_nocheck(fifo3_in_direct),
+      .out_pkt(by2pd_in_pkt_direct),
+      .out_meta(by2pd_in_meta_direct),
+      .out_usr(by2pd_in_usr_direct),
 
-        .stats_out(nf_stats__pcie)
-    );
-    channel_fifo_avlstrm#(.DUAL_CLOCK(0)) my_by2pd (
-        .Clk_i(clk_pcie),
-        .Rst_n_i(rst_n_pcie),
+      .stats_out(nf_stats__pcie)
+      );
+   channel_fifo_avlstrm#(.DUAL_CLOCK(0)) my_by2pd
+     (
+      .Clk_i(clk_pcie),
+      .Rst_n_i(rst_n_pcie),
 
-        .in_pkt(by2pd_in_pkt_direct),
-        .in_meta(by2pd_in_meta_direct),
-        .in_usr(by2pd_in_usr_direct),
+      .in_pkt(by2pd_in_pkt_direct),
+      .in_meta(by2pd_in_meta_direct),
+      .in_usr(by2pd_in_usr_direct),
 
-        .out_pkt(dma_in_pkt_direct),
-        .out_meta(dma_in_meta_direct),
-        .out_usr(dma_in_usr_direct),
+      .out_pkt(dma_in_pkt_direct),
+      .out_meta(dma_in_meta_direct),
+      .out_usr(dma_in_usr_direct),
 
-        .stats_out(by2pd_stats__pcie),						    
-        .stats_in_pkt_max_fill_level_addr(REG_MAX_NF2PDU),
-        .stats_in_pkt_addr(REG_MERGE_PKT),
-        .stats_in_pkt_sop_addr(REG_MERGE_PKT_SOP),
-        .stats_in_meta_addr(REG_MERGE_META),
-        .stats_in_rule_addr(REG_MERGE_RULE)
-    );
-    dma_avlstrm my_dma (
-        .Clk(clk_pcie),
-        .Rst_n(rst_n_pcie),
-        .pcie_rb_wr_data(pcie_rb_wr_data),
-        .pcie_rb_wr_addr(pcie_rb_wr_addr),
-        .pcie_rb_wr_en(pcie_rb_wr_en),
-        .pcie_rb_wr_base_addr(pcie_rb_wr_base_addr),
-        .pcie_rb_almost_full(pcie_rb_almost_full),
-        .pcie_rb_update_valid(internal_rb_update_valid),
-        .pcie_rb_update_size(pcie_rb_update_size),
-        .disable_pcie(disable_pcie),
+      .stats_out(by2pd_stats__pcie),						    
+      .stats_in_pkt_max_fill_level_addr(REG_MAX_NF2PDU),
+      .stats_in_pkt_addr(REG_MERGE_PKT),
+      .stats_in_pkt_sop_addr(REG_MERGE_PKT_SOP),
+      .stats_in_meta_addr(REG_MERGE_META),
+      .stats_in_rule_addr(REG_MERGE_RULE)
+      );
+   dma_avlstrm my_dma
+     (
+      .Clk(clk_pcie),
+      .Rst_n(rst_n_pcie),
+      .pcie_rb_wr_data(pcie_rb_wr_data),
+      .pcie_rb_wr_addr(pcie_rb_wr_addr),
+      .pcie_rb_wr_en(pcie_rb_wr_en),
+      .pcie_rb_wr_base_addr(pcie_rb_wr_base_addr),
+      .pcie_rb_almost_full(pcie_rb_almost_full),
+      .pcie_rb_update_valid(internal_rb_update_valid),
+      .pcie_rb_update_size(pcie_rb_update_size),
+      .disable_pcie(disable_pcie),
 
-        .ddr_wr_req_data(ddr_wr_req_data),
-        .ddr_wr_req_valid(ddr_wr_req_valid),
-        .ddr_wr_req_almost_full(ddr_wr_req_almost_full),
-        .ddr_rd_req_data(ddr_rd_req_data),
-        .ddr_rd_req_valid(ddr_rd_req_valid),
-        .ddr_rd_req_almost_full(ddr_rd_req_almost_full),
-        .ddr_rd_resp_data(ddr_rd_resp_out_data),
-        .ddr_rd_resp_valid(ddr_rd_resp_out_valid),
-        .ddr_rd_resp_almost_full(ddr_rd_resp_out_ready),
+      .ddr_wr_req_data(ddr_wr_req_data),
+      .ddr_wr_req_valid(ddr_wr_req_valid),
+      .ddr_wr_req_almost_full(ddr_wr_req_almost_full),
+      .ddr_rd_req_data(ddr_rd_req_data),
+      .ddr_rd_req_valid(ddr_rd_req_valid),
+      .ddr_rd_req_almost_full(ddr_rd_req_almost_full),
+      .ddr_rd_resp_data(ddr_rd_resp_out_data),
+      .ddr_rd_resp_valid(ddr_rd_resp_out_valid),
+      .ddr_rd_resp_almost_full(ddr_rd_resp_out_ready),
 
-	.pdumeta_cpu(pdumeta_cpu),
-        .in_pkt(dma_in_pkt_direct),
-        .in_meta(dma_in_meta_direct),
-        .in_usr(dma_in_usr_direct),
-        .nomatch_pkt(fifo4_in_direct),
-			
-	.stats_out(dma_stats__pcie)	
-    );
+      .pdumeta_cpu(pdumeta_cpu),
+      .in_pkt(dma_in_pkt_direct),
+      .in_meta(dma_in_meta_direct),
+      .in_usr(dma_in_usr_direct),
+      .nomatch_pkt(fifo4_in_direct),
+      
+      .stats_out(dma_stats__pcie)	
+      );
 endmodule: top
 
