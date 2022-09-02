@@ -65,7 +65,7 @@ end
     .stats_out(stats_out)
    );
 
-   avl_stream_if#(.WIDTH(512)) mux();
+   `AVL_STREAM_PKT_IF((512), mux);
     
    assign in.empty=eth_in.empty;
    assign in.eop=eth_in.eop;

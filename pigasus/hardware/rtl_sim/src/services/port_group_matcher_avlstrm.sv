@@ -76,7 +76,7 @@ module port_group_matcher_avlstrm  (
     .stats_out(stats_out)
    );
 
-   avl_stream_if#(.WIDTH(512))               pg_pkt_ifc();
+   `AVL_STREAM_AF_PKT_IF((512),               pg_pkt_ifc);
 
     port_group_avlstrm port_group_inst (
         .Clk(Clk), 

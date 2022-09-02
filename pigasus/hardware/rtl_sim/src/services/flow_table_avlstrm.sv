@@ -52,7 +52,7 @@ module flow_table_avlstrm (
     stats_cnt in_meta_inst(
         .Clk        (Clk),
         .Rst_n      (Rst_n),
-        .valid      (in_meta.valid),
+       .valid      (in_meta.valid),
         .ready      (in_meta.ready),
         .stats_flit (stats_in_meta)
     );

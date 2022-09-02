@@ -96,7 +96,7 @@ module fast_pm_avlstrm
     .stats_out(stats_out_back)
    );
 
-    avl_stream_if#(.WIDTH(512))               sm_pkt_ifc();
+    `AVL_STREAM_AF_PKT_IF((512), sm_pkt_ifc);
 
     string_matcher_avlstrm sm_inst(
         .Clk(Clk), 

@@ -61,10 +61,30 @@ interface avl_stream_if#(WIDTH=512,MAX_CH=CH_MIN) ();
 
 endinterface
 
-`define AVLSTRM_DFLT(AVWIDTH,AVNAME) \
-   avl_stream_if#(.WIDTH(AVWIDTH)) AVNAME(); \
-   assign AVNAME.almost_full=1; \
-   assign AVNAME.sop=1; \
-   assign AVNAME.eop=1;
-		
+//
+// A HACK
+//
+
+// use this by default, if you don't use sop/eop or almost full.
+// if you do, there will be a conflict during compile, and
+// you have to explicitly choose the option.
+`define AVL_STREAM_IF(AVWIDTH,AVNAME) \
+     avl_stream_if#(.WIDTH(AVWIDTH)) AVNAME(); \
+     assign AVNAME.almost_full = 1'b1; \
+     assign AVNAME.sop = 1'b1; \
+     assign AVNAME.eop = 1'b1;
+
+
+`define AVL_STREAM_PKT_IF(AVWIDTH,AVNAME) \
+     avl_stream_if#(.WIDTH(AVWIDTH)) AVNAME(); \
+     assign AVNAME.almost_full = 1'b1; 
+
+`define AVL_STREAM_AF_IF(AVWIDTH,AVNAME) \
+     avl_stream_if#(.WIDTH(AVWIDTH)) AVNAME(); \
+     assign AVNAME.sop = 1'b1; \
+     assign AVNAME.eop = 1'b1;
+
+`define AVL_STREAM_AF_PKT_IF(AVWIDTH,AVNAME) \
+     avl_stream_if#(.WIDTH(AVWIDTH)) AVNAME(); 
+
 `endif

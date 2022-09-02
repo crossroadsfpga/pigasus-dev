@@ -35,25 +35,7 @@ module non_fast_pm_no_bypass_avlstrm (
     output logic [31:0] nf_max_rule_fifo
 );
 
-    //avl_stream_if#(.WIDTH(512))               nf_in_pkt_ifc();
-    //avl_stream_if#(.WIDTH($bits(metadata_t))) nf_in_meta_ifc();
-    //avl_stream_if#(.WIDTH(512))               nf_in_rule_ifc();
-    //avl_stream_if#(.WIDTH(512))               bypass_pkt_ifc();
-    //avl_stream_if#(.WIDTH($bits(metadata_t))) bypass_meta_ifc();
-    //avl_stream_if#(.WIDTH(512))               bypass_rule_ifc();
-    //avl_stream_if#(.WIDTH(512))               nf_in_pkt_fifo_ifc();
-    //avl_stream_if#(.WIDTH($bits(metadata_t))) nf_in_meta_fifo_ifc();
-    //avl_stream_if#(.WIDTH(512))               nf_in_rule_fifo_ifc();
-    //avl_stream_if#(.WIDTH(512))               bypass_pkt_fifo_ifc();
-    //avl_stream_if#(.WIDTH($bits(metadata_t))) bypass_meta_fifo_ifc();
-    //avl_stream_if#(.WIDTH(512))               bypass_rule_fifo_ifc();
-    avl_stream_if#(.WIDTH(512))               nf_pkt_ifc();
-    //avl_stream_if#(.WIDTH($bits(metadata_t))) nf_meta_ifc();
-    //avl_stream_if#(.WIDTH(512))               nf_rule_ifc();
-    //avl_stream_if#(.WIDTH(512))               nf_check_pkt_ifc();
-    //avl_stream_if#(.WIDTH(512))               nf_check_pkt_fifo_ifc();
-    //avl_stream_if#(.WIDTH($bits(metadata_t))) nf_meta_fifo_ifc();
-    //avl_stream_if#(.WIDTH(512))               nf_rule_fifo_ifc();
+    `AVL_STREAM_IF((512),               nf_pkt_ifc);
 
 // ////////////////////// Bypass Front//////////////////////////////////
 // bypass_front_avlstrm bypass_nf_front_inst(

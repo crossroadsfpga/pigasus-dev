@@ -139,25 +139,25 @@ module non_fast_pm_avlstrm (
     .stats_out(stats_out)
    );
 
-    avl_stream_if#(.WIDTH(512))               nf_in_pkt_ifc();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) nf_in_meta_ifc();
-    avl_stream_if#(.WIDTH(512))               nf_in_rule_ifc();
-    avl_stream_if#(.WIDTH(512))               bypass_pkt_ifc();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) bypass_meta_ifc();
-    avl_stream_if#(.WIDTH(512))               bypass_rule_ifc();
-    avl_stream_if#(.WIDTH(512))               nf_in_pkt_fifo_ifc();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) nf_in_meta_fifo_ifc();
-    avl_stream_if#(.WIDTH(512))               nf_in_rule_fifo_ifc();
-    avl_stream_if#(.WIDTH(512))               bypass_pkt_fifo_ifc();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) bypass_meta_fifo_ifc();
-    avl_stream_if#(.WIDTH(512))               bypass_rule_fifo_ifc();
-    avl_stream_if#(.WIDTH(512))               nf_pkt_ifc();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) nf_meta_ifc();
-    avl_stream_if#(.WIDTH(512))               nf_rule_ifc();
-    avl_stream_if#(.WIDTH(512))               nf_check_pkt_ifc();
-    avl_stream_if#(.WIDTH(512))               nf_check_pkt_fifo_ifc();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) nf_meta_fifo_ifc();
-    avl_stream_if#(.WIDTH(512))               nf_rule_fifo_ifc();
+   `AVL_STREAM_AF_PKT_IF((512), nf_in_pkt_ifc);
+   `AVL_STREAM_AF_IF(($bits(metadata_t)), nf_in_meta_ifc);
+   `AVL_STREAM_AF_PKT_IF((512), nf_in_rule_ifc);
+   `AVL_STREAM_AF_PKT_IF((512), bypass_pkt_ifc);
+   `AVL_STREAM_AF_IF(($bits(metadata_t)), bypass_meta_ifc);
+   `AVL_STREAM_AF_PKT_IF((512), bypass_rule_ifc);
+   `AVL_STREAM_PKT_IF((512), nf_in_pkt_fifo_ifc);
+   `AVL_STREAM_IF(($bits(metadata_t)), nf_in_meta_fifo_ifc);
+   `AVL_STREAM_PKT_IF((512), nf_in_rule_fifo_ifc);
+   `AVL_STREAM_PKT_IF((512), bypass_pkt_fifo_ifc);
+   `AVL_STREAM_IF(($bits(metadata_t)), bypass_meta_fifo_ifc);
+   `AVL_STREAM_PKT_IF((512), bypass_rule_fifo_ifc);
+   `AVL_STREAM_AF_PKT_IF((512), nf_pkt_ifc);
+   `AVL_STREAM_AF_IF(($bits(metadata_t)), nf_meta_ifc);
+   `AVL_STREAM_AF_PKT_IF((512), nf_rule_ifc);
+   `AVL_STREAM_AF_PKT_IF((512), nf_check_pkt_ifc);
+   `AVL_STREAM_PKT_IF((512), nf_check_pkt_fifo_ifc);
+   `AVL_STREAM_IF(($bits(metadata_t)), nf_meta_fifo_ifc);
+   `AVL_STREAM_PKT_IF((512), nf_rule_fifo_ifc);
 
 ////////////////////// Bypass Front//////////////////////////////////
 bypass_front_avlstrm bypass_nf_front_inst(
@@ -176,10 +176,12 @@ bypass_front_avlstrm bypass_nf_front_inst(
 );
 
 ////////////////////// Bypass channel //////////////////////////////////
-avl_stream_if#(.WIDTH($bits(stats_t)))stub[3]();
-assign stub[0].ready=0;
-assign stub[1].ready=0;
-assign stub[2].ready=0;
+`AVL_STREAM_PKT_IF(($bits(stats_t)), stub0);
+`AVL_STREAM_PKT_IF(($bits(stats_t)), stub1);
+`AVL_STREAM_PKT_IF(($bits(stats_t)), stub2);
+assign stub0.ready=0;
+assign stub1.ready=0;
+assign stub2.ready=0;
    
 
 channel_fifo_avlstrm #(
@@ -194,7 +196,7 @@ channel_fifo_avlstrm #(
     .stats_in_rule(stats_bypass_rule),
     .in_pkt_fill_level(bypass_fill_level),
 
-    .stats_out(stub[0]),
+    .stats_out(stub0),
 		
     .in_pkt(bypass_pkt_ifc),
     .in_meta(bypass_meta_ifc),
@@ -213,7 +215,7 @@ channel_fifo_avlstrm #(
 
     .in_pkt_fill_level(bypass2nf_fill_level),
 
-    .stats_out(stub[1]),
+    .stats_out(stub1),
 
     .in_pkt  (nf_in_pkt_ifc),
     .in_meta (nf_in_meta_ifc),
@@ -266,7 +268,7 @@ channel_fifo_avlstrm #(
 
     .in_pkt_fill_level(nf2bypass_fill_level),
 
-    .stats_out(stub[2]),
+    .stats_out(stub2),
 
     .in_pkt(nf_check_pkt_ifc),
     .in_meta(nf_meta_ifc),

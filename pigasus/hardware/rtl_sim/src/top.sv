@@ -69,11 +69,11 @@ module top
    //
    // begin I/O channels section
    //
-   avl_stream_if#(.WIDTH(PDU_META_WIDTH)) pdumeta_cpu();
+   `AVL_STREAM_IF((PDU_META_WIDTH), pdumeta_cpu);
    assign pdumeta_cpu.data=pdumeta_cpu_data;
    assign pdumeta_cpu.valid=pdumeta_cpu_valid;
 
-   avl_stream_if#(.WIDTH(512)) eth_out();
+   `AVL_STREAM_PKT_IF((512), eth_out); // uses sop and eop
    assign out_data=eth_out.data;
    assign out_valid=eth_out.valid;
    assign eth_out.ready=out_ready;
@@ -81,7 +81,7 @@ module top
    assign out_eop=eth_out.eop;
    assign out_empty=eth_out.empty;
 
-   avl_stream_if#(.WIDTH(512)) eth_in();
+   `AVL_STREAM_PKT_IF((512), eth_in); // uses sop and eop
    assign eth_in.sop=in_sop;
    assign eth_in.eop=in_eop;
    assign eth_in.data=in_data;
@@ -96,25 +96,25 @@ module top
    //
    logic [31:0] 		    stats_unpackdata;
    
-   avl_stream_if#(.WIDTH($bits(stats_t))) eth_stats__clk(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) r_stats__clk(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) dm2sm_stats__clk(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats__clk(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) fpm_stats__pcie(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) sm2pg_stats__pcie(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) pg_stats__pcie(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) pg2nf_stats__pcie(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) nf_stats__pcie(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) by2pd_stats__pcie(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) dma_stats__pcie(); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), eth_stats__clk); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), r_stats__clk); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), dm2sm_stats__clk); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), fpm_stats__clk); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), fpm_stats__pcie); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), sm2pg_stats__pcie); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), pg_stats__pcie); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), pg2nf_stats__pcie); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), nf_stats__pcie); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), by2pd_stats__pcie); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), dma_stats__pcie); // uses sop and eop
    
-   avl_stream_if#(.WIDTH($bits(stats_t))) mux1__clk(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) mux__clk(); // uses almost full // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) mux11__pcie(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) mux1__pcie(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) mux2__pcie(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) stats__clk2pcie(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(stats_t))) all_stats__pcie(); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), mux1__clk); // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(($bits(stats_t)), mux__clk); // uses almost full // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), mux11__pcie); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), mux1__pcie); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), mux2__pcie); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), stats__clk2pcie); // uses sop and eop
+   `AVL_STREAM_PKT_IF(($bits(stats_t)), all_stats__pcie); // uses sop and eop
 
    // I think Intel has wider mux IPs
    pkt_mux_avlstrm_3 r_eth_fpm_mux
@@ -224,51 +224,51 @@ module top
 
    assign pcie_rb_update_valid = disable_pcie ? 1'b0 : internal_rb_update_valid;
 
-   avl_stream_if#(.WIDTH(512)) ethernet_out0_direct(); // uses sop and eop
-   avl_stream_if#(.WIDTH(512)) ethernet_out1_direct(); // uses sop and eop
-   avl_stream_if#(.WIDTH(512)) ethernet_out2_direct(); // uses sop and eop
-   avl_stream_if#(.WIDTH(512)) ethernet_out3_direct(); // uses sop and eop 
-   avl_stream_if#(.WIDTH(512)) ethernet_out4_direct(); // uses sop and eop
+   `AVL_STREAM_PKT_IF((512), ethernet_out0_direct); // uses sop and eop
+   `AVL_STREAM_PKT_IF((512), ethernet_out1_direct); // uses sop and eop
+   `AVL_STREAM_PKT_IF((512), ethernet_out2_direct); // uses sop and eop
+   `AVL_STREAM_PKT_IF((512), ethernet_out3_direct); // uses sop and eop 
+   `AVL_STREAM_PKT_IF((512), ethernet_out4_direct); // uses sop and eop
 
-   avl_stream_if#(.WIDTH(512)) r_eth_direct(); // uses sop and eop
+   `AVL_STREAM_PKT_IF((512), r_eth_direct); // uses sop and eop
    
-   avl_stream_if#(.WIDTH(512)) fifo0_in_direct(); // uses almost full // uses sop and eop
-   avl_stream_if#(.WIDTH(512)) fifo3_in_direct(); // uses almost full // uses sop and eop
-   avl_stream_if#(.WIDTH(512)) fifo4_in_direct(); // uses almost full // uses sop and eop
-   avl_stream_if#(.WIDTH(512)) fifo1_in_direct(); // uses almost full  // uses sop and eop
-   avl_stream_if#(.WIDTH(512)) fifo2_in_direct(); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF((512), fifo0_in_direct); // uses almost full // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF((512), fifo3_in_direct); // uses almost full // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF((512), fifo4_in_direct); // uses almost full // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF((512), fifo1_in_direct); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF((512), fifo2_in_direct); // uses almost full  // uses sop and eop
 
-   avl_stream_if#(.WIDTH(512)) dm2sm_in_pkt_direct(); // uses almost full  // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(metadata_t))) dm2sm_in_meta_direct(); // uses almost full
-   avl_stream_if#(.WIDTH(512)) dm2sm_in_usr_direct(); // uses almost full // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF((512), dm2sm_in_pkt_direct); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_IF(($bits(metadata_t)), dm2sm_in_meta_direct); // uses almost full
+   `AVL_STREAM_AF_PKT_IF((512), dm2sm_in_usr_direct); // uses almost full // uses sop and eop
 
-   avl_stream_if#(.WIDTH(512)) fpm_in_pkt_direct();  // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(metadata_t))) fpm_in_meta_direct();
-   avl_stream_if#(.WIDTH(512)) fpm_in_usr_direct(); // uses sop and eop
+   `AVL_STREAM_PKT_IF((512), fpm_in_pkt_direct);  // uses sop and eop
+   `AVL_STREAM_IF(($bits(metadata_t)), fpm_in_meta_direct);
+   `AVL_STREAM_PKT_IF((512), fpm_in_usr_direct); // uses sop and eop
    
-   avl_stream_if#(.WIDTH(512)) sm2pg_in_pkt_direct(); // uses almost full  // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(metadata_t))) sm2pg_in_meta_direct(); // uses almost full
-   avl_stream_if#(.WIDTH(512)) sm2pg_in_usr_direct(); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF((512), sm2pg_in_pkt_direct); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_IF(($bits(metadata_t)), sm2pg_in_meta_direct); // uses almost full
+   `AVL_STREAM_AF_PKT_IF((512), sm2pg_in_usr_direct); // uses almost full  // uses sop and eop
 
-   avl_stream_if#(.WIDTH(512)) pg_in_pkt_direct();  // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(metadata_t))) pg_in_meta_direct();
-   avl_stream_if#(.WIDTH(512)) pg_in_usr_direct(); // uses sop and eop
+   `AVL_STREAM_PKT_IF((512), pg_in_pkt_direct);  // uses sop and eop
+   `AVL_STREAM_IF(($bits(metadata_t)), pg_in_meta_direct);
+   `AVL_STREAM_PKT_IF((512), pg_in_usr_direct); // uses sop and eop
    
-   avl_stream_if#(.WIDTH(512)) pg2nf_in_pkt_direct(); // uses almost full  // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(metadata_t))) pg2nf_in_meta_direct(); // uses almost full
-   avl_stream_if#(.WIDTH(512)) pg2nf_in_usr_direct(); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF((512), pg2nf_in_pkt_direct); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_IF(($bits(metadata_t)), pg2nf_in_meta_direct); // uses almost full
+   `AVL_STREAM_AF_PKT_IF((512), pg2nf_in_usr_direct); // uses almost full  // uses sop and eop
 
-   avl_stream_if#(.WIDTH(512)) nf_in_pkt_direct();  // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(metadata_t))) nf_in_meta_direct();
-   avl_stream_if#(.WIDTH(512)) nf_in_usr_direct(); // uses sop and eop
+   `AVL_STREAM_PKT_IF((512), nf_in_pkt_direct);  // uses sop and eop
+   `AVL_STREAM_IF(($bits(metadata_t)), nf_in_meta_direct);
+   `AVL_STREAM_PKT_IF((512), nf_in_usr_direct); // uses sop and eop
    
-   avl_stream_if#(.WIDTH(512)) by2pd_in_pkt_direct(); // uses almost full  // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(metadata_t))) by2pd_in_meta_direct(); // uses almost full
-   avl_stream_if#(.WIDTH(512)) by2pd_in_usr_direct(); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF((512), by2pd_in_pkt_direct); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_IF(($bits(metadata_t)), by2pd_in_meta_direct); // uses almost full
+   `AVL_STREAM_AF_PKT_IF((512), by2pd_in_usr_direct); // uses almost full  // uses sop and eop
    
-   avl_stream_if#(.WIDTH(512)) dma_in_pkt_direct(); // uses sop and eop
-   avl_stream_if#(.WIDTH($bits(metadata_t))) dma_in_meta_direct();
-   avl_stream_if#(.WIDTH(512)) dma_in_usr_direct(); // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF((512), dma_in_pkt_direct); // uses sop and eop
+   `AVL_STREAM_AF_IF(($bits(metadata_t)), dma_in_meta_direct);
+   `AVL_STREAM_AF_PKT_IF((512), dma_in_usr_direct); // uses sop and eop
    
    ethernet_multi_out_avlstrm my_ethernet 
      (

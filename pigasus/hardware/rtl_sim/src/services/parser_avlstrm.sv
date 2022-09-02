@@ -11,8 +11,6 @@ module parser_avlstrm (
     avl_stream_if.rx in_pkt,
     avl_stream_if.tx out_meta
 );
-    avl_stream_if#(.WIDTH(512)) port(); 
-    avl_stream_if#(.WIDTH($bits(metadata_t))) port_meta[2](); 
 
     parser parser_inst (
         .clk            (Clk),
@@ -39,8 +37,7 @@ module parser_avlstrm (
 
     //stats
     stats_cnt out_meta_inst(
-        .Clk        (Clk),
-        .Rst_n      (Rst_n),
+        .Clk        (Clk),        .Rst_n      (Rst_n),
         .valid      (out_meta.valid),
         .ready      (out_meta.ready),
         .stats_flit (stats_out_meta)

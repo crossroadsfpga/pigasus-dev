@@ -123,18 +123,18 @@ module reassembler_avlstrm (
     .stats_out(stats_out)
    );
 
-    avl_stream_if#(.WIDTH(512))               incomp_pkt();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) incomp_meta();
-    avl_stream_if#(.WIDTH(PKT_AWIDTH))        emptylist();
-    avl_stream_if#(.WIDTH(PKT_AWIDTH))        emptylist_i();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) parser_meta();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) parser_meta_fifo();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) ftw_out_meta();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) ftw_reorder_meta();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) ftw_nonforward_meta();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) ftw_forward_meta();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) dm_meta_in();
-    avl_stream_if#(.WIDTH($bits(metadata_t))) dm_meta_out();
+    `AVL_STREAM_PKT_IF((512), incomp_pkt);
+    `AVL_STREAM_IF(($bits(metadata_t)), incomp_meta);
+    `AVL_STREAM_AF_IF((PKT_AWIDTH), emptylist);
+    `AVL_STREAM_AF_IF((PKT_AWIDTH), emptylist_i);
+    `AVL_STREAM_AF_IF(($bits(metadata_t)), parser_meta);
+    `AVL_STREAM_IF(($bits(metadata_t)), parser_meta_fifo);
+    `AVL_STREAM_AF_IF(($bits(metadata_t)), ftw_out_meta);
+    `AVL_STREAM_AF_IF(($bits(metadata_t)), ftw_reorder_meta);
+    `AVL_STREAM_IF(($bits(metadata_t)), ftw_nonforward_meta);
+    `AVL_STREAM_IF(($bits(metadata_t)), ftw_forward_meta);
+    `AVL_STREAM_IF(($bits(metadata_t)), dm_meta_in);
+    `AVL_STREAM_IF(($bits(metadata_t)), dm_meta_out);
 
    assign eth.ready = 1'b1;
    

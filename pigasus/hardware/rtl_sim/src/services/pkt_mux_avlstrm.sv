@@ -19,8 +19,8 @@ module ethernet_mux_avlstrm (
     avl_stream_if.rx in3,
     avl_stream_if.rx in4
 );
-  avl_stream_if#(.WIDTH(512)) mux();
-  avl_stream_if#(.WIDTH(512)) out();
+  `AVL_STREAM_PKT_IF((512), mux);
+  `AVL_STREAM_IF((512), out);
 
   assign out_valid = out.valid;
   assign out_data = out.data;
