@@ -89,9 +89,9 @@ module stats_avlstrm
    input logic Clk_pcie,
 
    avl_stream_if.rx stats_update,
-   avl_stream_if.rx stats_wreq,
-   avl_stream_if.rx stats_rreq,
-   avl_stream_if.tx stats_rresp
+   avl_stream_if.rx stats_wr_req,
+   avl_stream_if.rx stats_rd_req,
+   avl_stream_if.tx stats_rd_resp
    );
 
    logic [31:0] stats_unpackdata;
@@ -123,15 +123,15 @@ module stats_avlstrm
       .readdata(stats_unpackdata)  
       );
    
-   assign status_raddr=status_rreq.data;
-   assign status_read=status_rreq.valid;
+   assign status_raddr=status_rd_req.data;
+   assign status_read=status_rd_req.valid;
    
-   assign status_waddr=status_wreq.data[61:32];
-   assign status_writedata=status_wreq.data[31:0];
-   assign status_write=status_wreq.valid;
+   assign status_waddr=status_wr_req.data[61:32];
+   assign status_writedata=status_wr_req.data[31:0];
+   assign status_write=status_wr_req.valid;
   
-   assign status_rresp.data=status_readdata;
-   assign status_rresp.valid=status_readdata_valid;
+   assign status_rd_resp.data=status_readdata;
+   assign status_rd_resp.valid=status_readdata_valid;
  
    always @(posedge Clk_status) begin
       status_raddr_r           <= status_raddr[7:0];

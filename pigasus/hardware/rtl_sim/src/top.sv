@@ -10,17 +10,20 @@ module top
    input logic [0:0] 		    rst_high,
    input logic [0:0] 		    clk_pcie,
    input logic [0:0] 		    rst_pcie,
+
    input logic [0:0] 		    in_sop,
    input logic [0:0] 		    in_eop,
    input logic [511:0] 		    in_data,
    input logic [5:0] 		    in_empty,
    input logic [0:0] 		    in_valid,
+
    output logic [511:0] 	    out_data,
    output logic [0:0] 		    out_valid,
    output logic [0:0] 		    out_sop,
    output logic [0:0] 		    out_eop,
    output logic [5:0] 		    out_empty,
    input logic [0:0] 		    out_ready,
+
    output logic [0:0] 		    pkt_buf_wren,
    output logic [PKTBUF_AWIDTH-1:0] pkt_buf_wraddress,
    output logic [PKTBUF_AWIDTH-1:0] pkt_buf_rdaddress,
@@ -28,6 +31,7 @@ module top
    output logic [0:0] 		    pkt_buf_rden,
    input logic [0:0] 		    pkt_buf_rd_valid,
    input logic [519:0] 		    pkt_buf_rddata,
+
    output logic [513:0] 	    pcie_rb_wr_data,
    output logic [11:0] 		    pcie_rb_wr_addr,
    output logic [0:0] 		    pcie_rb_wr_en,
@@ -36,9 +40,11 @@ module top
    output logic [0:0] 		    pcie_rb_update_valid,
    output logic [11:0] 		    pcie_rb_update_size,
    input logic [0:0] 		    disable_pcie,
+
    input logic [27:0] 		    pdumeta_cpu_data,
    input logic [0:0] 		    pdumeta_cpu_valid,
    output logic [9:0] 		    pdumeta_cnt,
+
    output logic [540:0] 	    ddr_wr_req_data,
    output logic [0:0] 		    ddr_wr_req_valid,
    input logic [0:0] 		    ddr_wr_req_almost_full,
@@ -48,6 +54,7 @@ module top
    input logic [511:0] 		    ddr_rd_resp_data,
    input logic [0:0] 		    ddr_rd_resp_valid,
    output logic [0:0] 		    ddr_rd_resp_almost_full,
+   
    input logic [0:0] 		    clk_status,
    input logic [29:0] 		    status_addr,
    input logic [0:0] 		    status_read,
@@ -88,19 +95,35 @@ module top
    assign eth_in.empty=in_empty;
    assign eth_in.valid=in_valid;
 
-   `AVL_STREAM_IF(30, status_rreq);
-   `AVL_STREAM_IF(62, status_wreq);
-   `AVL_STREAM_IF(32, status_rresp);
+   `AVL_STREAM_IF(30, status_rd_req);
+   `AVL_STREAM_IF(62, status_wr_req);
+   `AVL_STREAM_IF(32, status_rd_resp);
 
-   assign status_rreq.data=status_addr;
-   assign status_rreq.valid=status_read;
+   assign status_rd_req.data=status_addr;
+   assign status_rd_req.valid=status_read;
    
-   assign status_wreq.data = {status_addr, status_writedata};
-   assign status_wreq.valid = status_write;
+   assign status_wr_req.data = {status_addr, status_writedata};
+   assign status_wr_req.valid = status_write;
 
-   assign status_readdata = status_rresp.data;
-   assign status_readdata_valid = status_rresp.valid;
+   assign status_readdata = status_rd_resp.data;
+   assign status_readdata_valid = status_rd_resp.valid;
    
+   `AVL_STREAM_AF_IF(29, ddr_rd_req);
+   `AVL_STREAM_AF_IF(541, ddr_wr_req);
+   `AVL_STREAM_AF_IF(512, ddr_rd_resp);
+
+   assign ddr_wr_req_data=ddr_wr_req.data;
+   assign ddr_wr_req_valid=ddr_wr_req.valid;
+   assign ddr_wr_req.almost_full=ddr_wr_req_almost_full;
+
+   assign ddr_rd_req_data=ddr_rd_req.data;
+   assign ddr_rd_req_valid=ddr_rd_req.valid;
+   assign ddr_rd_req.almost_full=ddr_rd_req_almost_full;
+   
+   assign ddr_rd_resp.data=ddr_rd_resp_data;
+   assign ddr_rd_resp.valid=ddr_rd_resp_valid;
+   assign ddr_rd_resp_almost_full=ddr_rd_resp.almost_full;
+
    //
    // end I/O channels section
    //
@@ -183,9 +206,9 @@ module top
       .Clk_pcie(clk_pcie),
       
       .stats_update(all_stats__pcie),
-      .stats_wreq(status_wreq),
-      .stats_rreq(status_rreq),
-      .stats_rresp(status_rresp)
+      .stats_wr_req(status_wr_req),
+      .stats_rd_req(status_rd_req),
+      .stats_rd_resp(status_rd_resp)
       );
 
    
@@ -243,9 +266,9 @@ module top
    `AVL_STREAM_AF_IF(($bits(metadata_t)), by2pd_in_meta_direct); // uses almost full
    `AVL_STREAM_AF_PKT_IF(512, by2pd_in_usr_direct); // uses almost full  // uses sop and eop
    
-   `AVL_STREAM_AF_PKT_IF(512, dma_in_pkt_direct); // uses sop and eop
-   `AVL_STREAM_AF_IF(($bits(metadata_t)), dma_in_meta_direct);
-   `AVL_STREAM_AF_PKT_IF(512, dma_in_usr_direct); // uses sop and eop
+   `AVL_STREAM_PKT_IF(512, dma_in_pkt_direct); // uses sop and eop
+   `AVL_STREAM_IF(($bits(metadata_t)), dma_in_meta_direct);
+   `AVL_STREAM_PKT_IF(512, dma_in_usr_direct); // uses sop and eop
 
    ethernet_multi_out_avlstrm my_ethernet 
      (
@@ -471,15 +494,9 @@ module top
       .pcie_rb_update_size(pcie_rb_update_size),
       .disable_pcie(disable_pcie),
 
-      .ddr_wr_req_data(ddr_wr_req_data),
-      .ddr_wr_req_valid(ddr_wr_req_valid),
-      .ddr_wr_req_almost_full(ddr_wr_req_almost_full),
-      .ddr_rd_req_data(ddr_rd_req_data),
-      .ddr_rd_req_valid(ddr_rd_req_valid),
-      .ddr_rd_req_almost_full(ddr_rd_req_almost_full),
-      .ddr_rd_resp_data(ddr_rd_resp_out_data),
-      .ddr_rd_resp_valid(ddr_rd_resp_out_valid),
-      .ddr_rd_resp_almost_full(ddr_rd_resp_out_ready),
+      .ddr_wr_req(ddr_wr_req),
+      .ddr_rd_req(ddr_rd_req),
+      .ddr_rd_resp(ddr_rd_resp), // there is some extern connection magic about ddr_rd_resp_out
 
       .pdumeta_cpu(pdumeta_cpu),
       .in_pkt(dma_in_pkt_direct),

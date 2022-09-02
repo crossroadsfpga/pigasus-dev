@@ -3,6 +3,7 @@
 `include "./src/stats_reg.sv"
 
 // top-level module
+// keep this module next to PCIe
 module dma_avlstrm 
   (
    input logic 			    Clk, 
@@ -19,15 +20,9 @@ module dma_avlstrm
    input logic 			    disable_pcie,
    
    // DRAM
-   output 			    ddr_wr_t ddr_wr_req_data,
-   output logic 		    ddr_wr_req_valid,
-   input logic 			    ddr_wr_req_almost_full,
-   output 			    ddr_rd_t ddr_rd_req_data,
-   output logic 		    ddr_rd_req_valid,
-   input logic 			    ddr_rd_req_almost_full,
-   input logic [511:0] 		    ddr_rd_resp_data,
-   input logic 			    ddr_rd_resp_valid,
-   output logic 		    ddr_rd_resp_almost_full,
+   avl_stream_if.tx ddr_wr_req,
+   avl_stream_if.tx ddr_rd_req,
+   avl_stream_if.rx ddr_rd_resp,
 				    
    avl_stream_if.rx pdumeta_cpu,
    avl_stream_if.rx in_pkt,
@@ -38,11 +33,30 @@ module dma_avlstrm
    // stats channel			    
    avl_stream_if.tx stats_out
 );
-
-   assign in_pkt.almost_full=0;
-   assign in_meta.almost_full=0;
-   assign in_usr.almost_full=0;
  
+   ddr_wr_t ddr_wr_req_data;
+   logic 			    ddr_wr_req_valid;
+   logic 			    ddr_wr_req_almost_full;
+   ddr_rd_t ddr_rd_req_data;
+   logic 			    ddr_rd_req_valid;
+   logic 			    ddr_rd_req_almost_full;
+   logic [511:0] 		    ddr_rd_resp_data;
+   logic 			    ddr_rd_resp_valid;
+   logic 			    ddr_rd_resp_almost_full;
+
+   assign ddr_wr_req.data=ddr_wr_req_data;
+   assign ddr_wr_req.valid=ddr_wr_req_valid;
+   assign ddr_wr_req_almost_full=ddr_wr_req.almost_full;
+
+   assign ddr_rd_req.data=ddr_rd_req_data;
+   assign ddr_rd_req.valid=ddr_rd_req_valid;
+   assign ddr_rd_req_almost_full=ddr_rd_req.almost_full;
+   
+   assign ddr_rd_resp_data=ddr_rd_resp.data;
+   assign ddr_rd_resp_valid=ddr_rd_resp.valid;
+   assign ddr_rd_resp.almost_full=ddr_rd_resp_almost_full;
+
+   
    logic [31:0] 		    dma_pkt;
    logic [31:0] 		    cpu_nomatch_pkt;
    logic [31:0] 		    cpu_match_pkt;
