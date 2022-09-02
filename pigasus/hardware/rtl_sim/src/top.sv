@@ -269,7 +269,7 @@ module top
    avl_stream_if#(.WIDTH(512)) dma_in_pkt_direct(); // uses sop and eop
    avl_stream_if#(.WIDTH($bits(metadata_t))) dma_in_meta_direct();
    avl_stream_if#(.WIDTH(512)) dma_in_usr_direct(); // uses sop and eop
-
+   
    ethernet_multi_out_avlstrm my_ethernet 
      (
       .Clk(clk),

@@ -61,4 +61,10 @@ interface avl_stream_if#(WIDTH=512,MAX_CH=CH_MIN) ();
 
 endinterface
 
+`define AVLSTRM_DFLT(AVWIDTH,AVNAME) \
+   avl_stream_if#(.WIDTH(AVWIDTH)) AVNAME(); \
+   assign AVNAME.almost_full=1; \
+   assign AVNAME.sop=1; \
+   assign AVNAME.eop=1;
+		
 `endif
