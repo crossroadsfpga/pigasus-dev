@@ -39,6 +39,10 @@ module dma_avlstrm
    avl_stream_if.tx stats_out
 );
 
+   assign in_pkt.almost_full=0;
+   assign in_meta.almost_full=0;
+   assign in_usr.almost_full=0;
+ 
    logic [31:0] 		    dma_pkt;
    logic [31:0] 		    cpu_nomatch_pkt;
    logic [31:0] 		    cpu_match_pkt;

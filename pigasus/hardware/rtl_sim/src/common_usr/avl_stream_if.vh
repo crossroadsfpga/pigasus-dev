@@ -5,11 +5,11 @@
 `ifndef AVL_STREAM_IF_VH
 `define AVL_STREAM_IF_VH
 
-interface avl_stream_if#(WIDTH=512,NUM=2) ();
+interface avl_stream_if#(WIDTH=512,MAX_CH=4) ();
    
    typedef logic [WIDTH-1:0]    t_data;
    typedef logic [$clog2(WIDTH/8)-1:0] t_empty;
-   typedef logic [NUM-1:0] 	t_channel;
+   typedef logic [$clog2(MAX_CH)-1:0]  t_channel;
    
    t_data      data;
    logic 			valid;
