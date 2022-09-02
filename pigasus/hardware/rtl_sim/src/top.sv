@@ -73,7 +73,7 @@ module top
    assign pdumeta_cpu.data=pdumeta_cpu_data;
    assign pdumeta_cpu.valid=pdumeta_cpu_valid;
 
-   `AVL_STREAM_PKT_IF((512), eth_out); // uses sop and eop
+   `AVL_STREAM_PKT_IF(512, eth_out); // uses sop and eop
    assign out_data=eth_out.data;
    assign out_valid=eth_out.valid;
    assign eth_out.ready=out_ready;
@@ -81,12 +81,26 @@ module top
    assign out_eop=eth_out.eop;
    assign out_empty=eth_out.empty;
 
-   `AVL_STREAM_PKT_IF((512), eth_in); // uses sop and eop
+   `AVL_STREAM_PKT_IF(512, eth_in); // uses sop and eop
    assign eth_in.sop=in_sop;
    assign eth_in.eop=in_eop;
    assign eth_in.data=in_data;
    assign eth_in.empty=in_empty;
    assign eth_in.valid=in_valid;
+
+   `AVL_STREAM_IF(30, status_rreq);
+   `AVL_STREAM_IF(62, status_wreq);
+   `AVL_STREAM_IF(32, status_rresp);
+
+   assign status_rreq.data=status_addr;
+   assign status_rreq.valid=status_read;
+   
+   assign status_wreq.data = {status_addr, status_writedata};
+   assign status_wreq.valid = status_write;
+
+   assign status_readdata = status_rresp.data;
+   assign status_readdata_valid = status_rresp.valid;
+   
    //
    // end I/O channels section
    //
@@ -94,8 +108,6 @@ module top
    //
    // begin stats section
    //
-   logic [31:0] 		    stats_unpackdata;
-   
    `AVL_STREAM_PKT_IF(($bits(stats_t)), eth_stats__clk); // uses sop and eop
    `AVL_STREAM_PKT_IF(($bits(stats_t)), r_stats__clk); // uses sop and eop
    `AVL_STREAM_PKT_IF(($bits(stats_t)), dm2sm_stats__clk); // uses sop and eop
@@ -165,52 +177,17 @@ module top
       .out(all_stats__pcie)
       );
    
-   logic [31:0] 		    ctrl_status;
-   logic [7:0] 			    status_addr_r;
-   logic [STAT_AWIDTH-1:0] 	    status_addr_sel_r;
-   logic 			    status_write_r;
-   logic 			    status_read_r;
-   logic [31:0] 		    status_writedata_r;
-
-   stats_unpacker_avlstrm stats_unpacker 
+   stats_avlstrm stats_reg
      (
-      .Clk(clk_pcie),
-      .stats_in(all_stats__pcie),
+      .Clk_status(clk_status), 
+      .Clk_pcie(clk_pcie),
       
-      // combinational read from pci_status domain
-      .readaddr(status_addr_r),
-      .readdata(stats_unpackdata)  
+      .stats_update(all_stats__pcie),
+      .stats_wreq(status_wreq),
+      .stats_rreq(status_rreq),
+      .stats_rresp(status_rresp)
       );
-   
-   always @(posedge clk_status) begin
-      status_addr_r           <= status_addr[7:0];
-      status_addr_sel_r       <= status_addr[29:30-STAT_AWIDTH];
-      
-      status_read_r           <= status_read;
-      status_write_r          <= status_write;
-      status_writedata_r      <= status_writedata;
-      status_readdata_valid <= 1'b0;
-      
-      if (status_read_r) begin
-         if (status_addr_sel_r == TOP_REG) begin
-            status_readdata_valid <= 1'b1;
-            if (status_addr_r==REG_CTRL) begin
-               status_readdata <= ctrl_status;
-	    end else begin
-               status_readdata <= stats_unpackdata;
-	    end
-         end
-      end
-      //Disable write
-      if (status_addr_sel_r == TOP_REG & status_write_r) begin
-         case (status_addr_r)
-           REG_CTRL: begin
-              ctrl_status   <= status_writedata_r;
-           end
-           default: ctrl_status <= 32'b0;
-         endcase
-      end
-   end
+
    
    //
    // end stats section
@@ -224,52 +201,52 @@ module top
 
    assign pcie_rb_update_valid = disable_pcie ? 1'b0 : internal_rb_update_valid;
 
-   `AVL_STREAM_PKT_IF((512), ethernet_out0_direct); // uses sop and eop
-   `AVL_STREAM_PKT_IF((512), ethernet_out1_direct); // uses sop and eop
-   `AVL_STREAM_PKT_IF((512), ethernet_out2_direct); // uses sop and eop
-   `AVL_STREAM_PKT_IF((512), ethernet_out3_direct); // uses sop and eop 
-   `AVL_STREAM_PKT_IF((512), ethernet_out4_direct); // uses sop and eop
+   `AVL_STREAM_PKT_IF(512, ethernet_out0_direct); // uses sop and eop
+   `AVL_STREAM_PKT_IF(512, ethernet_out1_direct); // uses sop and eop
+   `AVL_STREAM_PKT_IF(512, ethernet_out2_direct); // uses sop and eop
+   `AVL_STREAM_PKT_IF(512, ethernet_out3_direct); // uses sop and eop 
+   `AVL_STREAM_PKT_IF(512, ethernet_out4_direct); // uses sop and eop
 
-   `AVL_STREAM_PKT_IF((512), r_eth_direct); // uses sop and eop
+   `AVL_STREAM_PKT_IF(512, r_eth_direct); // uses sop and eop
    
-   `AVL_STREAM_AF_PKT_IF((512), fifo0_in_direct); // uses almost full // uses sop and eop
-   `AVL_STREAM_AF_PKT_IF((512), fifo3_in_direct); // uses almost full // uses sop and eop
-   `AVL_STREAM_AF_PKT_IF((512), fifo4_in_direct); // uses almost full // uses sop and eop
-   `AVL_STREAM_AF_PKT_IF((512), fifo1_in_direct); // uses almost full  // uses sop and eop
-   `AVL_STREAM_AF_PKT_IF((512), fifo2_in_direct); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(512, fifo0_in_direct); // uses almost full // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(512, fifo3_in_direct); // uses almost full // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(512, fifo4_in_direct); // uses almost full // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(512, fifo1_in_direct); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(512, fifo2_in_direct); // uses almost full  // uses sop and eop
 
-   `AVL_STREAM_AF_PKT_IF((512), dm2sm_in_pkt_direct); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(512, dm2sm_in_pkt_direct); // uses almost full  // uses sop and eop
    `AVL_STREAM_AF_IF(($bits(metadata_t)), dm2sm_in_meta_direct); // uses almost full
-   `AVL_STREAM_AF_PKT_IF((512), dm2sm_in_usr_direct); // uses almost full // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(512, dm2sm_in_usr_direct); // uses almost full // uses sop and eop
 
-   `AVL_STREAM_PKT_IF((512), fpm_in_pkt_direct);  // uses sop and eop
+   `AVL_STREAM_PKT_IF(512, fpm_in_pkt_direct);  // uses sop and eop
    `AVL_STREAM_IF(($bits(metadata_t)), fpm_in_meta_direct);
-   `AVL_STREAM_PKT_IF((512), fpm_in_usr_direct); // uses sop and eop
+   `AVL_STREAM_PKT_IF(512, fpm_in_usr_direct); // uses sop and eop
    
-   `AVL_STREAM_AF_PKT_IF((512), sm2pg_in_pkt_direct); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(512, sm2pg_in_pkt_direct); // uses almost full  // uses sop and eop
    `AVL_STREAM_AF_IF(($bits(metadata_t)), sm2pg_in_meta_direct); // uses almost full
-   `AVL_STREAM_AF_PKT_IF((512), sm2pg_in_usr_direct); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(512, sm2pg_in_usr_direct); // uses almost full  // uses sop and eop
 
-   `AVL_STREAM_PKT_IF((512), pg_in_pkt_direct);  // uses sop and eop
+   `AVL_STREAM_PKT_IF(512, pg_in_pkt_direct);  // uses sop and eop
    `AVL_STREAM_IF(($bits(metadata_t)), pg_in_meta_direct);
-   `AVL_STREAM_PKT_IF((512), pg_in_usr_direct); // uses sop and eop
+   `AVL_STREAM_PKT_IF(512, pg_in_usr_direct); // uses sop and eop
    
-   `AVL_STREAM_AF_PKT_IF((512), pg2nf_in_pkt_direct); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(512, pg2nf_in_pkt_direct); // uses almost full  // uses sop and eop
    `AVL_STREAM_AF_IF(($bits(metadata_t)), pg2nf_in_meta_direct); // uses almost full
-   `AVL_STREAM_AF_PKT_IF((512), pg2nf_in_usr_direct); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(512, pg2nf_in_usr_direct); // uses almost full  // uses sop and eop
 
-   `AVL_STREAM_PKT_IF((512), nf_in_pkt_direct);  // uses sop and eop
+   `AVL_STREAM_PKT_IF(512, nf_in_pkt_direct);  // uses sop and eop
    `AVL_STREAM_IF(($bits(metadata_t)), nf_in_meta_direct);
-   `AVL_STREAM_PKT_IF((512), nf_in_usr_direct); // uses sop and eop
+   `AVL_STREAM_PKT_IF(512, nf_in_usr_direct); // uses sop and eop
    
-   `AVL_STREAM_AF_PKT_IF((512), by2pd_in_pkt_direct); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(512, by2pd_in_pkt_direct); // uses almost full  // uses sop and eop
    `AVL_STREAM_AF_IF(($bits(metadata_t)), by2pd_in_meta_direct); // uses almost full
-   `AVL_STREAM_AF_PKT_IF((512), by2pd_in_usr_direct); // uses almost full  // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(512, by2pd_in_usr_direct); // uses almost full  // uses sop and eop
    
-   `AVL_STREAM_AF_PKT_IF((512), dma_in_pkt_direct); // uses sop and eop
+   `AVL_STREAM_AF_PKT_IF(512, dma_in_pkt_direct); // uses sop and eop
    `AVL_STREAM_AF_IF(($bits(metadata_t)), dma_in_meta_direct);
-   `AVL_STREAM_AF_PKT_IF((512), dma_in_usr_direct); // uses sop and eop
-   
+   `AVL_STREAM_AF_PKT_IF(512, dma_in_usr_direct); // uses sop and eop
+
    ethernet_multi_out_avlstrm my_ethernet 
      (
       .Clk(clk),
