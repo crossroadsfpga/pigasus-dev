@@ -76,10 +76,12 @@ module top
    //
    // begin I/O channels section
    //
+   // ready not check, need fixing if over noc
    `AVL_STREAM_IF((PDU_META_WIDTH), pdumeta_cpu);
    assign pdumeta_cpu.data=pdumeta_cpu_data;
    assign pdumeta_cpu.valid=pdumeta_cpu_valid;
 
+   // proper stream with back pressure
    `AVL_STREAM_PKT_IF(512, eth_out); // uses sop and eop
    assign out_data=eth_out.data;
    assign out_valid=eth_out.valid;
@@ -98,11 +100,13 @@ module top
 	 timer=timer+1;
 	 if(out_valid&&out_eop) begin
 	    ticker<=ticker+1;
-	    $display("sending pkt(%d) at time %d\n",ticker,timer);
+	    //$display("sending pkt(%d) at time %d\n",ticker,timer);
 	 end
       end
    end // always@ (posedge clk)
-   
+
+   // in bound from ethernet, ready not checked
+   // receiving fifo will drop packet
    `AVL_STREAM_PKT_IF(512, eth_in); // uses sop and eop
    assign eth_in.sop=in_sop;
    assign eth_in.eop=in_eop;
@@ -110,9 +114,10 @@ module top
    assign eth_in.empty=in_empty;
    assign eth_in.valid=in_valid;
 
-   `AVL_STREAM_IF(30, status_rd_req);
-   `AVL_STREAM_IF(62, status_wr_req);
-   `AVL_STREAM_IF(32, status_rd_resp);
+   // no back pressure, need fixing if over noc
+   `AVL_STREAM_NB_IF(30, status_rd_req);
+   `AVL_STREAM_NB_IF(62, status_wr_req);
+   `AVL_STREAM_NB_IF(32, status_rd_resp);
 
    assign status_rd_req.data=status_addr;
    assign status_rd_req.valid=status_read;
@@ -122,7 +127,8 @@ module top
 
    assign status_readdata = status_rd_resp.data;
    assign status_readdata_valid = status_rd_resp.valid;
-   
+
+   // proper stream with almost full back pressure
    `AVL_STREAM_AF_IF(29, ddr_rd_req);
    `AVL_STREAM_AF_IF(541, ddr_wr_req);
    `AVL_STREAM_AF_IF(512, ddr_rd_resp);
@@ -140,9 +146,10 @@ module top
 //   assign ddr_rd_resp.valid=ddr_rd_resp_valid;
 //   assign ddr_rd_resp_almost_full=ddr_rd_resp.almost_full;
 
-   `AVL_STREAM_IF(PKTBUF_AWIDTH, pkt_buf_rd_req);
-   `AVL_STREAM_IF(PKTBUF_AWIDTH+520, pkt_buf_wr_req);
-   `AVL_STREAM_IF(520, pkt_buf_rd_resp);
+   // no back pressure, need fixing if over noc
+   `AVL_STREAM_NB_IF(PKTBUF_AWIDTH, pkt_buf_rd_req);
+   `AVL_STREAM_NB_IF(PKTBUF_AWIDTH+520, pkt_buf_wr_req);
+   `AVL_STREAM_NB_IF(520, pkt_buf_rd_resp);
 
    assign pkt_buf_wraddress=pkt_buf_wr_req.data[(PKTBUF_AWIDTH-1+520):520];
    assign pkt_buf_wrdata=pkt_buf_wr_req.data[519:0];

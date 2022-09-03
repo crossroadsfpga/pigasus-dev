@@ -87,4 +87,14 @@ endinterface
 `define AVL_STREAM_AF_PKT_IF(AVWIDTH,AVNAME) \
      avl_stream_if#(.WIDTH(AVWIDTH)) AVNAME(); 
 
+// boundary interface without backpressuring
+// can't run over noc without fixing something
+`define AVL_STREAM_NB_IF(AVWIDTH,AVNAME) \
+     avl_stream_if#(.WIDTH(AVWIDTH)) AVNAME(); \
+     assign AVNAME.almost_full = 1'b1; \
+     assign AVNAME.ready = 1'b1; \
+     assign AVNAME.sop = 1'b1; \
+     assign AVNAME.eop = 1'b1;
+
+
 `endif
