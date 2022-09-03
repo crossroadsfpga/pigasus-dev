@@ -123,15 +123,15 @@ module stats_avlstrm
       .readdata(stats_unpackdata)  
       );
    
-   assign status_raddr=status_rd_req.data;
-   assign status_read=status_rd_req.valid;
+   assign status_raddr=stats_rd_req.data;
+   assign status_read=stats_rd_req.valid;
    
-   assign status_waddr=status_wr_req.data[61:32];
-   assign status_writedata=status_wr_req.data[31:0];
-   assign status_write=status_wr_req.valid;
+   assign status_waddr=stats_wr_req.data[61:32];
+   assign status_writedata=stats_wr_req.data[31:0];
+   assign status_write=stats_wr_req.valid;
   
-   assign status_rd_resp.data=status_readdata;
-   assign status_rd_resp.valid=status_readdata_valid;
+   assign stats_rd_resp.data=status_readdata;
+   assign stats_rd_resp.valid=status_readdata_valid;
  
    always @(posedge Clk_status) begin
       status_raddr_r           <= status_raddr[7:0];

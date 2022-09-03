@@ -77,9 +77,9 @@ module top
    // begin I/O channels section
    //
    // ready not checked, need fixing if pushing over noc
-   `AVL_STREAM_IF((PDU_META_WIDTH), pdumeta_cpu);
-   assign pdumeta_cpu.data=pdumeta_cpu_data;
-   assign pdumeta_cpu.valid=pdumeta_cpu_valid;
+   `AVL_STREAM_IF((PDU_META_WIDTH), pdumeta_cpu_nb);
+   assign pdumeta_cpu_nb.data=pdumeta_cpu_data;
+   assign pdumeta_cpu_nb.valid=pdumeta_cpu_valid;
 
    // proper stream with back pressure
    `AVL_STREAM_PKT_IF(512, eth_out); // uses sop and eop
@@ -107,27 +107,27 @@ module top
 
    // in bound from ethernet, ready not checked
    // receiving fifo will drop packet when full
-   `AVL_STREAM_PKT_IF(512, eth_in); // uses sop and eop
-   assign eth_in.sop=in_sop;
-   assign eth_in.eop=in_eop;
-   assign eth_in.data=in_data;
-   assign eth_in.empty=in_empty;
-   assign eth_in.valid=in_valid;
+   `AVL_STREAM_PKT_IF(512, eth_in_nb); // uses sop and eop
+   assign eth_in_nb.sop=in_sop;
+   assign eth_in_nb.eop=in_eop;
+   assign eth_in_nb.data=in_data;
+   assign eth_in_nb.empty=in_empty;
+   assign eth_in_nb.valid=in_valid;
 
    // no back pressure, need fixing if over noc
    // this wouldn't be hard to fix
-   `AVL_STREAM_NB_IF(30, status_rd_req);
-   `AVL_STREAM_NB_IF(62, status_wr_req);
-   `AVL_STREAM_NB_IF(32, status_rd_resp);
+   `AVL_STREAM_NB_IF(30, status_rd_req_nb);
+   `AVL_STREAM_NB_IF(62, status_wr_req_nb);
+   `AVL_STREAM_NB_IF(32, status_rd_resp_nb);
 
-   assign status_rd_req.data=status_addr;
-   assign status_rd_req.valid=status_read;
+   assign status_rd_req_nb.data=status_addr;
+   assign status_rd_req_nb.valid=status_read;
    
-   assign status_wr_req.data = {status_addr, status_writedata};
-   assign status_wr_req.valid = status_write;
+   assign status_wr_req_nb.data = {status_addr, status_writedata};
+   assign status_wr_req_nb.valid = status_write;
 
-   assign status_readdata = status_rd_resp.data;
-   assign status_readdata_valid = status_rd_resp.valid;
+   assign status_readdata = status_rd_resp_nb.data;
+   assign status_readdata_valid = status_rd_resp_nb.valid;
 
    // proper stream with almost full back pressure
    `AVL_STREAM_AF_IF(29, ddr_rd_req);
@@ -148,19 +148,19 @@ module top
 //   assign ddr_rd_resp_almost_full=ddr_rd_resp.almost_full;
 
    // no back pressure, this is a latency sensitive interface 
-   `AVL_STREAM_NB_IF(PKTBUF_AWIDTH, pkt_buf_rd_req);
-   `AVL_STREAM_NB_IF(PKTBUF_AWIDTH+520, pkt_buf_wr_req);
-   `AVL_STREAM_NB_IF(520, pkt_buf_rd_resp);
+   `AVL_STREAM_NB_IF(PKTBUF_AWIDTH, pkt_buf_rd_req_ls);
+   `AVL_STREAM_NB_IF(PKTBUF_AWIDTH+520, pkt_buf_wr_req_ls);
+   `AVL_STREAM_NB_IF(520, pkt_buf_rd_resp_ls);
 
-   assign pkt_buf_wraddress=pkt_buf_wr_req.data[(PKTBUF_AWIDTH-1+520):520];
-   assign pkt_buf_wrdata=pkt_buf_wr_req.data[519:0];
-   assign pkt_buf_wren=pkt_buf_wr_req.valid;
+   assign pkt_buf_wraddress=pkt_buf_wr_req_ls.data[(PKTBUF_AWIDTH-1+520):520];
+   assign pkt_buf_wrdata=pkt_buf_wr_req_ls.data[519:0];
+   assign pkt_buf_wren=pkt_buf_wr_req_ls.valid;
 
-   assign pkt_buf_rdaddress=pkt_buf_rd_req.data;
-   assign pkt_buf_rden=pkt_buf_rd_req.valid;
+   assign pkt_buf_rdaddress=pkt_buf_rd_req_ls.data;
+   assign pkt_buf_rden=pkt_buf_rd_req_ls.valid;
    
-   assign pkt_buf_rd_resp.data=pkt_buf_rddata;
-   assign pkt_buf_rd_resp.valid=pkt_buf_rd_valid;
+   assign pkt_buf_rd_resp_ls.data=pkt_buf_rddata;
+   assign pkt_buf_rd_resp_ls.valid=pkt_buf_rd_valid;
    //
    // end I/O channels section
    //
@@ -243,9 +243,9 @@ module top
       .Clk_pcie(clk_pcie),
       
       .stats_update(all_stats__pcie),
-      .stats_wr_req(status_wr_req),
-      .stats_rd_req(status_rd_req),
-      .stats_rd_resp(status_rd_resp)
+      .stats_wr_req(status_wr_req_nb),
+      .stats_rd_req(status_rd_req_nb),
+      .stats_rd_resp(status_rd_resp_nb)
       );
 
    
@@ -313,7 +313,7 @@ module top
       .Rst_n(rst_n),
       
       .eth_out(eth_out),
-      .eth_in(eth_in),
+      .eth_in(eth_in_nb),
       .out0(ethernet_out0_direct),
       .out1(ethernet_out1_direct),
       .out2(ethernet_out2_direct),
@@ -328,9 +328,9 @@ module top
       .Clk(clk),
       .Rst_n(rst_n),
 
-      .pkt_buf_wr_req(pkt_buf_wr_req),
-      .pkt_buf_rd_req(pkt_buf_rd_req),
-      .pkt_buf_rd_resp(pkt_buf_rd_resp),
+      .pkt_buf_wr_req(pkt_buf_wr_req_ls),
+      .pkt_buf_rd_req(pkt_buf_rd_req_ls),
+      .pkt_buf_rd_resp(pkt_buf_rd_resp_ls),
 
       .eth(r_eth_direct),
       .nopayload(fifo0_in_direct),
@@ -532,7 +532,7 @@ module top
       .ddr_rd_req(ddr_rd_req), // not used
       .ddr_rd_resp(ddr_rd_resp), // not used
 
-      .pdumeta_cpu(pdumeta_cpu),
+      .pdumeta_cpu(pdumeta_cpu_nb),
       .in_pkt(dma_in_pkt_direct),
       .in_meta(dma_in_meta_direct),
       .in_usr(dma_in_usr_direct),
