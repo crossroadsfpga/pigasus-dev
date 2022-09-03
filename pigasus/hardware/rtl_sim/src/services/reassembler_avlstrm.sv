@@ -8,14 +8,9 @@ module reassembler_avlstrm (
     input logic Rst_n,
 
 
-    output  logic [PKTBUF_AWIDTH-1:0]   pkt_buffer_writeaddress,
-    output  logic                       pkt_buffer_write,
-    output  flit_t                      pkt_buffer_writedata,
-
-    output  logic [PKTBUF_AWIDTH-1:0]   pkt_buffer_readaddress,
-    output  logic                       pkt_buffer_read,
-    input   logic                       pkt_buffer_readvalid,
-    input   flit_t                      pkt_buffer_readdata,    
+    avl_stream_if.tx pkt_buf_wr_req,
+    avl_stream_if.tx pkt_buf_rd_req,
+    avl_stream_if.rx pkt_buf_rd_resp,
 
     avl_stream_if.rx eth, 
     avl_stream_if.tx nopayload,
@@ -44,6 +39,24 @@ module reassembler_avlstrm (
     output logic [31:0]                 stats_nopayload_pkt,
     output logic [31:0]                 stats_dm_check_pkt
 );
+
+    logic [PKTBUF_AWIDTH-1:0]   pkt_buffer_writeaddress;
+    logic                       pkt_buffer_write;
+    flit_t                      pkt_buffer_writedata;
+
+    logic [PKTBUF_AWIDTH-1:0]   pkt_buffer_readaddress;
+    logic                       pkt_buffer_read;
+    logic                       pkt_buffer_readvalid;
+    flit_t                      pkt_buffer_readdata;    
+
+   assign pkt_buf_wr_req.data={pkt_buffer_writeaddress, pkt_buffer_writedata};
+   assign pkt_buf_wr_req.valid=pkt_buffer_write;
+
+   assign pkt_buf_rd_req.data=pkt_buffer_readaddress;
+   assign pkt_buf_rd_req.valid=pkt_buffer_read;
+   
+   assign pkt_buffer_readdata=pkt_buf_rd_resp.data;
+   assign pkt_buffer_readvalid=pkt_buf_rd_resp.valid;
 
    stats_t parser_meta_csr_readdata_s;
    stats_t stats_incomp_out_meta_s;

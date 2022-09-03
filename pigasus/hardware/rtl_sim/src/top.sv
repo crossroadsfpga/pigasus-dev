@@ -88,6 +88,21 @@ module top
    assign out_eop=eth_out.eop;
    assign out_empty=eth_out.empty;
 
+   integer 			    timer;
+   integer 			    ticker;
+   always@(posedge clk) begin
+      if(rst) begin
+	 timer<=0;
+	 ticker<=0;
+      end else begin
+	 timer=timer+1;
+	 if(out_valid&&out_eop) begin
+	    ticker<=ticker+1;
+	    $display("sending pkt(%d) at time %d\n",ticker,timer);
+	 end
+      end
+   end // always@ (posedge clk)
+   
    `AVL_STREAM_PKT_IF(512, eth_in); // uses sop and eop
    assign eth_in.sop=in_sop;
    assign eth_in.eop=in_eop;
@@ -116,14 +131,28 @@ module top
    assign ddr_wr_req_valid=ddr_wr_req.valid;
    assign ddr_wr_req.almost_full=ddr_wr_req_almost_full;
 
-   assign ddr_rd_req_data=ddr_rd_req.data;
-   assign ddr_rd_req_valid=ddr_rd_req.valid;
-   assign ddr_rd_req.almost_full=ddr_rd_req_almost_full;
+// not connected for reading
+//   assign ddr_rd_req_data=ddr_rd_req.data;
+//   assign ddr_rd_req_valid=ddr_rd_req.valid;
+//   assign ddr_rd_req.almost_full=ddr_rd_req_almost_full;
    
-   assign ddr_rd_resp.data=ddr_rd_resp_data;
-   assign ddr_rd_resp.valid=ddr_rd_resp_valid;
-   assign ddr_rd_resp_almost_full=ddr_rd_resp.almost_full;
+//   assign ddr_rd_resp.data=ddr_rd_resp_data;
+//   assign ddr_rd_resp.valid=ddr_rd_resp_valid;
+//   assign ddr_rd_resp_almost_full=ddr_rd_resp.almost_full;
 
+   `AVL_STREAM_IF(PKTBUF_AWIDTH, pkt_buf_rd_req);
+   `AVL_STREAM_IF(PKTBUF_AWIDTH+520, pkt_buf_wr_req);
+   `AVL_STREAM_IF(520, pkt_buf_rd_resp);
+
+   assign pkt_buf_wraddress=pkt_buf_wr_req.data[(PKTBUF_AWIDTH-1+520):520];
+   assign pkt_buf_wrdata=pkt_buf_wr_req.data[519:0];
+   assign pkt_buf_wren=pkt_buf_wr_req.valid;
+
+   assign pkt_buf_rdaddress=pkt_buf_rd_req.data;
+   assign pkt_buf_rden=pkt_buf_rd_req.valid;
+   
+   assign pkt_buf_rd_resp.data=pkt_buf_rddata;
+   assign pkt_buf_rd_resp.valid=pkt_buf_rd_valid;
    //
    // end I/O channels section
    //
@@ -290,13 +319,10 @@ module top
      (
       .Clk(clk),
       .Rst_n(rst_n),
-      .pkt_buffer_writeaddress(pkt_buf_wraddress),
-      .pkt_buffer_write(pkt_buf_wren),
-      .pkt_buffer_writedata(pkt_buf_wrdata),
-      .pkt_buffer_readaddress(pkt_buf_rdaddress),
-      .pkt_buffer_read(pkt_buf_rden),
-      .pkt_buffer_readvalid(pkt_buf_rd_valid),
-      .pkt_buffer_readdata(pkt_buf_rddata),
+
+      .pkt_buf_wr_req(pkt_buf_wr_req),
+      .pkt_buf_rd_req(pkt_buf_rd_req),
+      .pkt_buf_rd_resp(pkt_buf_rd_resp),
 
       .eth(r_eth_direct),
       .nopayload(fifo0_in_direct),
@@ -495,8 +521,8 @@ module top
       .disable_pcie(disable_pcie),
 
       .ddr_wr_req(ddr_wr_req),
-      .ddr_rd_req(ddr_rd_req),
-      .ddr_rd_resp(ddr_rd_resp), // there is some extern connection magic about ddr_rd_resp_out
+      .ddr_rd_req(ddr_rd_req), // not used
+      .ddr_rd_resp(ddr_rd_resp), // not used
 
       .pdumeta_cpu(pdumeta_cpu),
       .in_pkt(dma_in_pkt_direct),
