@@ -76,7 +76,7 @@ module top
    //
    // begin I/O channels section
    //
-   // ready not check, need fixing if over noc
+   // ready not checked, need fixing if pushing over noc
    `AVL_STREAM_IF((PDU_META_WIDTH), pdumeta_cpu);
    assign pdumeta_cpu.data=pdumeta_cpu_data;
    assign pdumeta_cpu.valid=pdumeta_cpu_valid;
@@ -106,7 +106,7 @@ module top
    end // always@ (posedge clk)
 
    // in bound from ethernet, ready not checked
-   // receiving fifo will drop packet
+   // receiving fifo will drop packet when full
    `AVL_STREAM_PKT_IF(512, eth_in); // uses sop and eop
    assign eth_in.sop=in_sop;
    assign eth_in.eop=in_eop;
@@ -115,6 +115,7 @@ module top
    assign eth_in.valid=in_valid;
 
    // no back pressure, need fixing if over noc
+   // this wouldn't be hard to fix
    `AVL_STREAM_NB_IF(30, status_rd_req);
    `AVL_STREAM_NB_IF(62, status_wr_req);
    `AVL_STREAM_NB_IF(32, status_rd_resp);
@@ -146,7 +147,7 @@ module top
 //   assign ddr_rd_resp.valid=ddr_rd_resp_valid;
 //   assign ddr_rd_resp_almost_full=ddr_rd_resp.almost_full;
 
-   // no back pressure, need fixing if over noc
+   // no back pressure, this is a latency sensitive interface 
    `AVL_STREAM_NB_IF(PKTBUF_AWIDTH, pkt_buf_rd_req);
    `AVL_STREAM_NB_IF(PKTBUF_AWIDTH+520, pkt_buf_wr_req);
    `AVL_STREAM_NB_IF(520, pkt_buf_rd_resp);
