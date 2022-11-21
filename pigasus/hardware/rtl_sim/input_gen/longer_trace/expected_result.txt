@@ -1,0 +1,58 @@
+//this is the expected result from pigasus-dev, after the services are removed
+//one counter--REG_CPU_NOMATCH_PKT--is different to pigasus 2.0. 
+//on pigasus 2.0 it is 0, but I think it was a bug fix?
+
+# REG_IN_PKT                :	       374
+# REG_OUT_PKT               :	       304
+# REG_INCOMP_OUT_META       :	       374
+# REG_PARSER_OUT_META       :	       374
+# REG_FT_IN_META            :	       374
+# REG_FT_OUT_META           :	       374
+# REG_EMPTYLIST_IN          :	      1398
+# REG_EMPTYLIST_OUT         :	       375
+# REG_DM_IN_META            :	       374
+# REG_DM_OUT_META           :	       281
+# REG_DM_IN_FORWARD_META    :	        93
+# REG_DM_IN_DROP_META       :	         0
+# REG_DM_IN_CHECK_META      :	       281
+# REG_DM_IN_OOO_META        :	         0
+# REG_DM_IN_FORWARD_OOO_META:	         0
+# REG_NOPAYLOAD_PKT         :	        93
+# REG_DM_CHECK_PKT          :	       281
+# REG_SM_PKT                :	       281
+# REG_SM_META               :	       224
+# REG_SM_RULE               :	      2757
+# REG_SM_CHECK_PKT          :	       224
+# REG_SM_CHECK_PKT_SOP      :	       224
+# REG_SM_NOCHECK_PKT        :	        57
+# REG_PG_PKT                :	       224
+# REG_PG_META               :	       131
+# REG_PG_RULE               :	       612
+# REG_PG_CHECK_PKT          :	       131
+# REG_PG_CHECK_PKT_SOP      :	       131
+# REG_PG_NOCHECK_PKT        :	        93
+# REG_BYPASS_PKT            :	         0
+# REG_BYPASS_PKT_SOP        :	         0
+# REG_BYPASS_META           :	         0
+# REG_BYPASS_RULE           :	         0
+# REG_NF_PKT                :	       131
+# REG_NF_META               :	        70
+# REG_NF_RULE               :	       265
+# REG_NF_CHECK_PKT          :	        70
+# REG_NF_CHECK_PKT_SOP      :	        70
+# REG_NF_NOCHECK_PKT        :	        61
+# REG_MERGE_PKT             :	        70
+# REG_MERGE_PKT_SOP         :	        70
+# REG_MERGE_META            :	        70
+# REG_MERGE_RULE            :	       265
+# REG_DMA_PKT               :	        70
+# REG_CPU_NOMATCH_PKT       :	        67 //this counter is different
+# REG_CPU_MATCH_PKT         :	         0
+# REG_CTRL                  :	         0
+# REG_MAX_DM2SM             :	         3
+# REG_MAX_SM2PG             :	        11
+# REG_MAX_PG2NF             :	         7
+# REG_MAX_BYPASS2NF         :	         3
+# REG_MAX_NF2PDU            :	        24
+# REG_SM_BYPASS_AF          :	         0
+# REG_SM_CDC_AF             :	         0
